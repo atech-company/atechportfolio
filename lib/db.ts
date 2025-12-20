@@ -2,8 +2,11 @@
  * Simple Database Layer
  * Uses JSON files for data storage
  * Can be easily switched to SQLite or PostgreSQL later
+ * 
+ * NOTE: This file is server-only and uses Node.js fs module
  */
 
+import 'server-only';
 import fs from 'fs';
 import path from 'path';
 
