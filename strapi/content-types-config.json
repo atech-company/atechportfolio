@@ -1,0 +1,144 @@
+{
+  "contentTypes": {
+    "home-page": {
+      "type": "single",
+      "displayName": "Home Page",
+      "apiId": "home-page",
+      "fields": [
+        {
+          "name": "hero",
+          "type": "component",
+          "componentType": "single",
+          "fields": [
+            { "name": "title", "type": "text", "required": true },
+            { "name": "subtitle", "type": "text", "long": true, "required": true },
+            { "name": "ctaText", "type": "text", "required": true },
+            { "name": "ctaLink", "type": "text", "required": true },
+            { "name": "backgroundImage", "type": "media", "multiple": false }
+          ]
+        },
+        {
+          "name": "cta",
+          "type": "component",
+          "componentType": "single",
+          "fields": [
+            { "name": "title", "type": "text", "required": true },
+            { "name": "description", "type": "text", "long": true, "required": true },
+            { "name": "ctaText", "type": "text", "required": true },
+            { "name": "ctaLink", "type": "text", "required": true }
+          ]
+        }
+      ]
+    },
+    "project": {
+      "type": "collection",
+      "displayName": "Project",
+      "apiId": "project",
+      "fields": [
+        { "name": "title", "type": "text", "required": true },
+        { "name": "slug", "type": "uid", "targetField": "title", "required": true },
+        { "name": "description", "type": "text", "long": true, "required": true },
+        { "name": "featured", "type": "boolean", "default": false },
+        { "name": "techStack", "type": "json" },
+        { "name": "projectUrl", "type": "text" },
+        { "name": "githubUrl", "type": "text" },
+        { "name": "images", "type": "media", "multiple": true },
+        { "name": "thumbnail", "type": "media", "multiple": false }
+      ]
+    },
+    "service": {
+      "type": "collection",
+      "displayName": "Service",
+      "apiId": "service",
+      "fields": [
+        { "name": "title", "type": "text", "required": true },
+        { "name": "slug", "type": "uid", "targetField": "title", "required": true },
+        { "name": "description", "type": "text", "long": true, "required": true },
+        { "name": "icon", "type": "text" }
+      ]
+    },
+    "testimonial": {
+      "type": "collection",
+      "displayName": "Testimonial",
+      "apiId": "testimonial",
+      "fields": [
+        { "name": "name", "type": "text", "required": true },
+        { "name": "role", "type": "text", "required": true },
+        { "name": "company", "type": "text", "required": true },
+        { "name": "content", "type": "text", "long": true, "required": true },
+        { "name": "rating", "type": "integer", "min": 1, "max": 5, "required": true },
+        { "name": "avatar", "type": "media", "multiple": false }
+      ]
+    },
+    "team-member": {
+      "type": "collection",
+      "displayName": "Team Member",
+      "apiId": "team-member",
+      "fields": [
+        { "name": "name", "type": "text", "required": true },
+        { "name": "role", "type": "text", "required": true },
+        { "name": "bio", "type": "text", "long": true, "required": true },
+        { "name": "avatar", "type": "media", "multiple": false },
+        {
+          "name": "socialLinks",
+          "type": "component",
+          "componentType": "single",
+          "fields": [
+            { "name": "linkedin", "type": "text" },
+            { "name": "twitter", "type": "text" },
+            { "name": "github", "type": "text" }
+          ]
+        }
+      ]
+    },
+    "blog-post": {
+      "type": "collection",
+      "displayName": "Blog Post",
+      "apiId": "blog-post",
+      "fields": [
+        { "name": "title", "type": "text", "required": true },
+        { "name": "slug", "type": "uid", "targetField": "title", "required": true },
+        { "name": "excerpt", "type": "text", "long": true, "required": true },
+        { "name": "content", "type": "richtext", "required": true },
+        { "name": "publishedAt", "type": "datetime", "required": true },
+        { "name": "category", "type": "text" },
+        { "name": "tags", "type": "json" },
+        { "name": "featuredImage", "type": "media", "multiple": false },
+        { "name": "author", "type": "relation", "relationType": "manyToOne", "target": "team-member" }
+      ]
+    },
+    "global-setting": {
+      "type": "single",
+      "displayName": "Global Setting",
+      "apiId": "global-setting",
+      "fields": [
+        { "name": "siteName", "type": "text", "required": true, "default": "ATECH" },
+        { "name": "logo", "type": "media", "multiple": false },
+        { "name": "favicon", "type": "media", "multiple": false },
+        {
+          "name": "socialLinks",
+          "type": "component",
+          "componentType": "single",
+          "fields": [
+            { "name": "facebook", "type": "text" },
+            { "name": "twitter", "type": "text" },
+            { "name": "linkedin", "type": "text" },
+            { "name": "github", "type": "text" },
+            { "name": "instagram", "type": "text" }
+          ]
+        },
+        {
+          "name": "seoDefaults",
+          "type": "component",
+          "componentType": "single",
+          "fields": [
+            { "name": "metaTitle", "type": "text" },
+            { "name": "metaDescription", "type": "text", "long": true },
+            { "name": "metaImage", "type": "media", "multiple": false }
+          ]
+        }
+      ]
+    }
+  }
+}
+
