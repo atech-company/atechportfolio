@@ -20,7 +20,6 @@ const nextConfig = {
   poweredByHeader: false,
   // Performance optimizations
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   // Production optimizations

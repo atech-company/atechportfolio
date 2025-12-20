@@ -1,13 +1,29 @@
 /**
  * API Integration Layer for Custom Admin Dashboard
  * Handles all API calls to local Next.js API routes
+ * During build time, reads directly from files to avoid HTTP requests
  */
+
+import { db } from './db';
+
+/**
+ * Check if we're in build time (no server running)
+ */
+function isBuildTime(): boolean {
+  return process.env.NEXT_PHASE === 'phase-production-build' || 
+         process.env.VERCEL === '1' && !process.env.VERCEL_URL;
+}
 
 /**
  * Get the base URL for API requests
  * Handles both server-side and client-side requests
  */
 function getBaseUrl(): string {
+  // During build time, return empty to use direct file access
+  if (isBuildTime()) {
+    return '';
+  }
+  
   // Server-side: use environment variable or construct from request
   if (typeof window === 'undefined') {
     // In production, use the full URL
@@ -184,6 +200,10 @@ async function fetchAPI<T>(
  * Fetch home page data
  */
 export async function fetchHomePage(): Promise<HomePage | null> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getHomePage();
+  }
   const data = await fetchAPI<HomePage>("/api/content/home-page");
   return data;
 }
@@ -192,6 +212,10 @@ export async function fetchHomePage(): Promise<HomePage | null> {
  * Fetch about page data
  */
 export async function fetchAboutPage(): Promise<any | null> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getAboutPage();
+  }
   const data = await fetchAPI<any>("/api/content/about-page");
   return data;
 }
@@ -200,6 +224,10 @@ export async function fetchAboutPage(): Promise<any | null> {
  * Fetch all services
  */
 export async function fetchServices(): Promise<Service[]> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getServices();
+  }
   const data = await fetchAPI<Service[]>("/api/content/services");
   if (!data) return [];
   // Handle array of services
@@ -210,6 +238,10 @@ export async function fetchServices(): Promise<Service[]> {
  * Fetch a single service by slug
  */
 export async function fetchService(slug: string): Promise<Service | null> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getServiceBySlug(slug) || null;
+  }
   const data = await fetchAPI<Service>(`/api/content/services?slug=${slug}`);
   return data || null;
 }
@@ -222,6 +254,27 @@ export async function fetchProjects(options?: {
   limit?: number;
   slug?: string;
 }): Promise<Project[]> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    let projects = db.getProjects();
+    
+    // Apply filters
+    if (options?.slug) {
+      const project = projects.find((p: any) => p.slug === options.slug);
+      return project ? [project] : [];
+    }
+    
+    if (options?.featured) {
+      projects = projects.filter((p: any) => p.featured === true);
+    }
+    
+    if (options?.limit) {
+      projects = projects.slice(0, options.limit);
+    }
+    
+    return projects;
+  }
+  
   let endpoint = "/api/content/projects";
   const params: string[] = [];
 
@@ -297,6 +350,11 @@ export async function fetchProjects(options?: {
  * Fetch a single project by slug
  */
 export async function fetchProject(slug: string): Promise<Project | null> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getProjectBySlug(slug) || null;
+  }
+  
   const data = await fetchAPI<any>(`/api/content/projects?slug=${slug}`);
   if (!data) return null;
   
@@ -340,6 +398,15 @@ export async function fetchProject(slug: string): Promise<Project | null> {
  * Fetch testimonials
  */
 export async function fetchTestimonials(limit?: number): Promise<Testimonial[]> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    let testimonials = db.getTestimonials();
+    if (limit) {
+      testimonials = testimonials.slice(0, limit);
+    }
+    return testimonials;
+  }
+  
   let endpoint = "/api/content/testimonials";
   if (limit) {
     endpoint += `?limit=${limit}`;
@@ -352,6 +419,11 @@ export async function fetchTestimonials(limit?: number): Promise<Testimonial[]> 
  * Fetch team members
  */
 export async function fetchTeamMembers(): Promise<TeamMember[]> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getTeamMembers();
+  }
+  
   const data = await fetchAPI<TeamMember[]>("/api/content/team-members");
   return data || [];
 }
@@ -364,6 +436,26 @@ export async function fetchBlogPosts(options?: {
   slug?: string;
   category?: string;
 }): Promise<BlogPost[]> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    let posts = db.getBlogPosts();
+    
+    if (options?.slug) {
+      const post = posts.find((p: any) => p.slug === options.slug);
+      return post ? [post] : [];
+    }
+    
+    if (options?.category) {
+      posts = posts.filter((p: any) => p.category === options.category);
+    }
+    
+    if (options?.limit) {
+      posts = posts.slice(0, options.limit);
+    }
+    
+    return posts;
+  }
+  
   // If slug is provided, fetch single post
   if (options?.slug) {
     const post = await fetchBlogPost(options.slug);
@@ -401,6 +493,11 @@ export async function fetchBlogPost(slug: string): Promise<BlogPost | null> {
  * Fetch global settings
  */
 export async function fetchGlobalSettings(): Promise<GlobalSettings | null> {
+  // During build time, read directly from files
+  if (isBuildTime()) {
+    return db.getGlobalSettings();
+  }
+  
   const data = await fetchAPI<GlobalSettings>("/api/content/global-settings");
   return data || null;
 }
