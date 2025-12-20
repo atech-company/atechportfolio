@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1766253460434,
+    "title": "News website",
+    "slug": "news-website",
+    "description": "efwfgerrth",
+    "featured": true,
+    "techStack": [
+      "react",
+      "sql"
+    ],
+    "projectUrl": "https://sabrinanews.com",
+    "githubUrl": "",
+    "createdAt": "2025-12-20T17:57:40.434Z",
+    "updatedAt": "2025-12-20T18:06:28.167Z",
+    "thumbnail": "/uploads/1766253815498-lv1__95164-768x768.webp",
+    "images": [
+      "/uploads/1766253836838-Alienware-25-Gaming-Monitor-AW2523HF-2.webp"
+    ]
+  }
+]

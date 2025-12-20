@@ -1,0 +1,84 @@
+{
+  "hero": {
+    "title": "About ATECH",
+    "subtitle": "We are a team of passionate developers, designers, and innovators dedicated to crafting exceptional digital experiences that transform businesses and delight users. With years of experience in cutting-edge technologies, we bring your vision to life."
+  },
+  "mission": {
+    "title": "Our Mission",
+    "description": "To empower businesses with cutting-edge technology solutions that drive growth and innovation. We believe in building long-term partnerships with our clients, delivering not just code, but strategic value that helps them achieve their goals and stay ahead in the digital landscape."
+  },
+  "vision": {
+    "title": "Our Vision",
+    "description": "To be the leading software development agency recognized for excellence, innovation, and client success. We envision a future where technology seamlessly enhances human experiences, and we're committed to being at the forefront of that transformation."
+  },
+  "values": [
+    {
+      "title": "Innovation",
+      "description": "We stay ahead of the curve with the latest technologies and best practices. Our team continuously learns and adapts to bring you the most innovative solutions."
+    },
+    {
+      "title": "Quality",
+      "description": "We deliver exceptional work that exceeds expectations. Every line of code, every design element, and every feature is crafted with meticulous attention to detail."
+    },
+    {
+      "title": "Integrity",
+      "description": "We build trust through transparency and honest communication. Our clients know they can rely on us to deliver on our promises and provide honest feedback."
+    },
+    {
+      "title": "Collaboration",
+      "description": "We work closely with our clients to achieve their goals. Your success is our success, and we're committed to being your trusted technology partner."
+    },
+    {
+      "title": "Excellence",
+      "description": "We strive for excellence in everything we do. From initial concept to final deployment, we maintain the highest standards of quality and professionalism."
+    },
+    {
+      "title": "Client-Centric",
+      "description": "Your needs come first. We take the time to understand your business, your goals, and your challenges to deliver solutions that truly make a difference."
+    }
+  ],
+  "timeline": [
+    {
+      "year": "2014",
+      "title": "Company Founded",
+      "description": "ATECH was established with a vision to transform businesses through innovative technology solutions. Started as a small team of passionate developers.",
+      "location": "San Francisco, CA",
+      "icon": "rocket"
+    },
+    {
+      "year": "2016",
+      "title": "First Major Client",
+      "description": "Secured our first enterprise client and delivered a successful digital transformation project that increased their efficiency by 300%.",
+      "location": "New York, NY",
+      "icon": "award"
+    },
+    {
+      "year": "2018",
+      "title": "Team Expansion",
+      "description": "Grew from 5 to 25 team members, adding expertise in mobile development, cloud services, and AI/ML technologies.",
+      "location": "Remote",
+      "icon": "users"
+    },
+    {
+      "year": "2020",
+      "title": "Global Recognition",
+      "description": "Won 'Best Tech Agency' award and reached 100+ successful projects milestone. Expanded services to include e-commerce and cloud solutions.",
+      "location": "Global",
+      "icon": "award"
+    },
+    {
+      "year": "2022",
+      "title": "Innovation Lab Launch",
+      "description": "Opened our innovation lab to research emerging technologies and develop cutting-edge solutions for future-ready businesses.",
+      "location": "Austin, TX",
+      "icon": "code"
+    },
+    {
+      "year": "2024",
+      "title": "500+ Projects Delivered",
+      "description": "Reached a major milestone of 500+ successful projects, serving 200+ clients worldwide with excellence and innovation.",
+      "location": "Worldwide",
+      "icon": "rocket"
+    }
+  ]
+}

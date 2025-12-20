@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1700000000001,
+    "title": "Web Development",
+    "slug": "web-development",
+    "description": "We create stunning, responsive websites and web applications using the latest technologies. From simple landing pages to complex enterprise solutions, we deliver high-performance web experiences that engage users and drive results.",
+    "icon": "code",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 1700000000002,
+    "title": "Mobile App Development",
+    "slug": "mobile-app-development",
+    "description": "Build native and cross-platform mobile applications for iOS and Android. We create intuitive, feature-rich mobile apps that provide seamless user experiences and help businesses reach their customers on the go.",
+    "icon": "smartphone",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 1700000000003,
+    "title": "UI/UX Design",
+    "slug": "ui-ux-design",
+    "description": "Transform your ideas into beautiful, user-friendly interfaces. Our design team creates intuitive user experiences that not only look great but also drive conversions and user satisfaction.",
+    "icon": "palette",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 1700000000004,
+    "title": "E-Commerce Solutions",
+    "slug": "ecommerce-solutions",
+    "description": "Launch and scale your online store with our comprehensive e-commerce solutions. We build secure, scalable platforms that handle everything from product management to payment processing.",
+    "icon": "shopping-cart",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 1700000000005,
+    "title": "Cloud Services",
+    "slug": "cloud-services",
+    "description": "Migrate to the cloud and optimize your infrastructure. We help businesses leverage cloud technologies for better scalability, security, and cost-efficiency.",
+    "icon": "cloud",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 1700000000006,
+    "title": "Consulting & Strategy",
+    "slug": "consulting-strategy",
+    "description": "Get expert guidance on your digital transformation journey. Our consultants help you make informed decisions about technology, architecture, and business strategy.",
+    "icon": "briefcase",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]
