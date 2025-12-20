@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
-import { type Service } from "@/lib/api";
+import { type Service } from "@/lib/types";
 
 interface ServiceCardProps {
   service: Service;

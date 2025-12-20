@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { type Service } from "@/lib/api";
+import { type Service } from "@/lib/types";
 import ServiceCard from "@/components/ui/ServiceCard";
 import { Code, Smartphone, Globe, Database, Zap, Shield } from "lucide-react";
 

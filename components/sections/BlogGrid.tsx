@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, User } from "lucide-react";
-import { type BlogPost, getStrapiImageUrl } from "@/lib/api";
+import { type BlogPost } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 import { formatDate, truncateText } from "@/lib/utils";
 
 interface BlogGridProps {

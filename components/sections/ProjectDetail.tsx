@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Github, ArrowLeft } from "lucide-react";
-import { type Project, getStrapiImageUrl } from "@/lib/api";
+import { type Project } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 
 interface ProjectDetailProps {
   project: Project;

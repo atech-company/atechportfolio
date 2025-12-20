@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Star, Quote } from "lucide-react";
-import { type Testimonial, getStrapiImageUrl } from "@/lib/api";
+import { type Testimonial } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];

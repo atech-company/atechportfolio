@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, ArrowLeft } from "lucide-react";
-import { type BlogPost, getStrapiImageUrl } from "@/lib/api";
+import { type BlogPost } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 import { formatDate } from "@/lib/utils";
 
 interface BlogPostDetailProps {

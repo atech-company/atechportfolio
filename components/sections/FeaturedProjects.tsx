@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ExternalLink, Github } from "lucide-react";
-import { type Project, getStrapiImageUrl } from "@/lib/api";
+import { type Project } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 import { truncateText } from "@/lib/utils";
 
 interface FeaturedProjectsProps {

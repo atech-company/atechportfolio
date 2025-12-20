@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Code, Smartphone, Globe, Database, Zap, Shield } from "lucide-react";
-import { type Service } from "@/lib/api";
+import { type Service } from "@/lib/types";
 import ServiceCard from "@/components/ui/ServiceCard";
 
 interface ServicesProps {

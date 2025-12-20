@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { getStrapiImageUrl, type Hero as HeroType } from "@/lib/api";
+import { type Hero as HeroType } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 
 interface HeroProps {
   data?: HeroType | null;

@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Linkedin, Twitter, Github } from "lucide-react";
-import { type TeamMember, getStrapiImageUrl } from "@/lib/api";
+import { type TeamMember } from "@/lib/types";
+import { getStrapiImageUrl } from "@/lib/image-utils";
 
 interface TeamSectionProps {
   members: TeamMember[];

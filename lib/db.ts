@@ -4,9 +4,9 @@
  * Can be easily switched to SQLite or PostgreSQL later
  * 
  * NOTE: This file is server-only and uses Node.js fs module
+ * It should only be imported dynamically in server contexts
  */
 
-import 'server-only';
 import fs from 'fs';
 import path from 'path';
 

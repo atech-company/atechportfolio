@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { type Service } from "@/lib/api";
+import { type Service } from "@/lib/types";
 import { Code, Smartphone, Globe, Database, Zap, Shield } from "lucide-react";
 
 const iconMap: Record<string, any> = {
