@@ -38,7 +38,11 @@ export default function NewProject() {
         router.push('/admin/projects');
       } else {
         const error = await res.json();
-        alert(error.error || 'Failed to create project');
+        if (error.code === 'SUPABASE_REQUIRED') {
+          alert('Supabase is not configured. Please set up Supabase for Vercel deployment. See VERCEL_SUPABASE_REQUIRED.md for instructions.');
+        } else {
+          alert(error.error || 'Failed to create project');
+        }
       }
     } catch (error) {
       console.error('Error creating project:', error);

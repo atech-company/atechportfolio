@@ -283,6 +283,10 @@ export const db = {
 
   // Projects (Collection)
   async getProjects() {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.getProjects();
+    }
     if (kv) {
       return await readKV<Array<any>>(KV_KEYS.projects, []);
     }
@@ -300,6 +304,16 @@ export const db = {
   },
 
   async createProject(data: any) {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.createProject(data);
+    }
+    
+    // Check if we're on Vercel without Supabase
+    if (process.env.VERCEL === '1') {
+      throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY environment variables. See SUPABASE_SETUP.md for instructions.');
+    }
+    
     const projects = await this.getProjects();
     const newProject = {
       id: Date.now(),
@@ -317,6 +331,16 @@ export const db = {
   },
 
   async updateProject(id: string | number, data: any) {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.updateProject(id, data);
+    }
+    
+    // Check if we're on Vercel without Supabase
+    if (process.env.VERCEL === '1') {
+      throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY environment variables. See SUPABASE_SETUP.md for instructions.');
+    }
+    
     const projects = await this.getProjects();
     const index = projects.findIndex((p: any) => p.id === id || p.id === Number(id));
     if (index === -1) throw new Error('Project not found');
@@ -334,6 +358,16 @@ export const db = {
   },
 
   async deleteProject(id: string | number) {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.deleteProject(id);
+    }
+    
+    // Check if we're on Vercel without Supabase
+    if (process.env.VERCEL === '1') {
+      throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY environment variables. See SUPABASE_SETUP.md for instructions.');
+    }
+    
     const projects = await this.getProjects();
     const filtered = projects.filter((p: any) => p.id !== id && p.id !== Number(id));
     if (kv) {

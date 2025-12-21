@@ -54,7 +54,12 @@ export default function AdminProjects() {
       if (res.ok) {
         fetchProjects();
       } else {
-        alert('Failed to delete project');
+        const error = await res.json();
+        if (error.code === 'SUPABASE_REQUIRED') {
+          alert('Supabase is not configured. Please set up Supabase for Vercel deployment. See VERCEL_SUPABASE_REQUIRED.md for instructions.');
+        } else {
+          alert(error.error || 'Failed to delete project');
+        }
       }
     } catch (error) {
       console.error('Error deleting project:', error);

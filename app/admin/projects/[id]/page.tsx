@@ -69,7 +69,11 @@ export default function EditProject() {
         router.push('/admin/projects');
       } else {
         const error = await res.json();
-        alert(error.error || 'Failed to update project');
+        if (error.code === 'SUPABASE_REQUIRED') {
+          alert('Supabase is not configured. Please set up Supabase for Vercel deployment. See VERCEL_SUPABASE_REQUIRED.md for instructions.');
+        } else {
+          alert(error.error || 'Failed to update project');
+        }
       }
     } catch (error) {
       console.error('Error updating project:', error);
@@ -90,7 +94,12 @@ export default function EditProject() {
       if (res.ok) {
         router.push('/admin/projects');
       } else {
-        alert('Failed to delete project');
+        const error = await res.json();
+        if (error.code === 'SUPABASE_REQUIRED') {
+          alert('Supabase is not configured. Please set up Supabase for Vercel deployment. See VERCEL_SUPABASE_REQUIRED.md for instructions.');
+        } else {
+          alert(error.error || 'Failed to delete project');
+        }
       }
     } catch (error) {
       console.error('Error deleting project:', error);

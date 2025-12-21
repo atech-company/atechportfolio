@@ -36,7 +36,12 @@ export async function POST(request: NextRequest) {
     const project = await db.createProject(body);
     return NextResponse.json({ data: project }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Create project error:', error);
+    const statusCode = error.message.includes('not configured') ? 503 : 500;
+    return NextResponse.json({ 
+      error: error.message,
+      code: error.message.includes('not configured') ? 'SUPABASE_REQUIRED' : 'UNKNOWN_ERROR'
+    }, { status: statusCode });
   }
 }
 

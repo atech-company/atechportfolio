@@ -27,7 +27,12 @@ export async function PUT(
     const project = await db.updateProject(params.id, body);
     return NextResponse.json({ data: project });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Update project error:', error);
+    const statusCode = error.message.includes('not configured') ? 503 : 500;
+    return NextResponse.json({ 
+      error: error.message,
+      code: error.message.includes('not configured') ? 'SUPABASE_REQUIRED' : 'UNKNOWN_ERROR'
+    }, { status: statusCode });
   }
 }
 
@@ -40,7 +45,12 @@ export async function DELETE(
     await db.deleteProject(params.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Delete project error:', error);
+    const statusCode = error.message.includes('not configured') ? 503 : 500;
+    return NextResponse.json({ 
+      error: error.message,
+      code: error.message.includes('not configured') ? 'SUPABASE_REQUIRED' : 'UNKNOWN_ERROR'
+    }, { status: statusCode });
   }
 }
 
