@@ -117,11 +117,19 @@ async function fetchAPI<T>(
     });
 
     if (!response.ok) {
-      console.error(`API error: ${response.status} ${response.statusText}`);
+      console.error(`[fetchAPI] API error: ${response.status} ${response.statusText}`);
       return null;
     }
 
-    const data: StrapiResponse<T> = await response.json();
+    const jsonData: any = await response.json();
+    console.log('[fetchAPI] Raw response:', {
+      endpoint,
+      hasData: !!jsonData.data,
+      dataType: Array.isArray(jsonData.data) ? 'array' : typeof jsonData.data,
+      dataLength: Array.isArray(jsonData.data) ? jsonData.data.length : 'not array',
+    });
+    
+    const data: StrapiResponse<T> = jsonData;
     return data.data as T;
   } catch (error) {
     console.error("Error fetching from API:", error);
@@ -235,6 +243,12 @@ export async function fetchProjects(options?: {
   }
 
   const data = await fetchAPI<any[]>(endpoint);
+  console.log('[fetchProjects] API response:', {
+    hasData: !!data,
+    isArray: Array.isArray(data),
+    length: Array.isArray(data) ? data.length : 'not array',
+    firstItem: Array.isArray(data) && data.length > 0 ? data[0] : null,
+  });
   if (!data) return [];
   
   // Transform from API response - extract attributes if present
