@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const post = db.getBlogPost(params.id);
+    const post = await db.getBlogPost(params.id);
     if (!post) {
       return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
     }
@@ -22,7 +22,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const post = db.updateBlogPost(params.id, body);
+    const post = await db.updateBlogPost(params.id, body);
     return NextResponse.json({ data: post });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -34,7 +34,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    db.deleteBlogPost(params.id);
+    await db.deleteBlogPost(params.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

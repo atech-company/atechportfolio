@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const service = db.getService(params.id);
+    const service = await db.getService(params.id);
     if (!service) {
       return NextResponse.json({ error: 'Service not found' }, { status: 404 });
     }
@@ -22,7 +22,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const service = db.updateService(params.id, body);
+    const service = await db.updateService(params.id, body);
     return NextResponse.json({ data: service });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -34,7 +34,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    db.deleteService(params.id);
+    await db.deleteService(params.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

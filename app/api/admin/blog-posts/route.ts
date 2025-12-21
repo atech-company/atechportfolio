@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const posts = db.getBlogPosts();
+    const posts = await db.getBlogPosts();
     // Sort by publishedAt descending
     posts.sort((a: any, b: any) => {
       const dateA = new Date(a.publishedAt || a.createdAt || 0).getTime();
@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const post = db.createBlogPost(body);
+    const post = await db.createBlogPost(body);
     return NextResponse.json({ data: post }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

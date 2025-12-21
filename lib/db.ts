@@ -1,23 +1,73 @@
 /**
- * Simple Database Layer
- * Uses JSON files for data storage
- * Can be easily switched to SQLite or PostgreSQL later
+ * Database Layer
+ * Uses Supabase (primary), Vercel KV (fallback), or file system (local dev)
  * 
- * NOTE: This file is server-only and uses Node.js fs module
+ * NOTE: This file is server-only and uses Node.js modules
  * It should only be imported dynamically in server contexts
  */
 
 import fs from 'fs';
 import path from 'path';
 
+// Lazy load Supabase DB
+let supabaseDb: any = null;
+let supabaseDbInitialized = false;
+
+async function getSupabaseDb() {
+  if (supabaseDbInitialized) return supabaseDb;
+  if (typeof window !== 'undefined') {
+    supabaseDbInitialized = true;
+    return null;
+  }
+  try {
+    const { isSupabaseConfigured } = await import('./supabase');
+    if (isSupabaseConfigured) {
+      const dbModule = await import('./supabase-db');
+      supabaseDb = dbModule.supabaseDb;
+    }
+    supabaseDbInitialized = true;
+    return supabaseDb;
+  } catch (e) {
+    console.warn('Supabase DB not available, using file system');
+    supabaseDbInitialized = true;
+    return null;
+  }
+}
+
+// Check if we're on Vercel and have KV configured (legacy support)
+const isVercel = process.env.VERCEL === '1';
+const hasKV = !!process.env.KV_REST_API_URL && !!process.env.KV_REST_API_TOKEN;
+
+// Lazy load KV (will be initialized on first use)
+let kv: any = null;
+let kvInitialized = false;
+
+async function getKV() {
+  if (kvInitialized) return kv;
+  if (!hasKV || typeof window !== 'undefined') {
+    kvInitialized = true;
+    return null;
+  }
+  try {
+    const kvModule = await import('@vercel/kv');
+    kv = kvModule.kv;
+    kvInitialized = true;
+    return kv;
+  } catch (e) {
+    console.warn('Vercel KV not available, using file system');
+    kvInitialized = true;
+    return null;
+  }
+}
+
 const DATA_DIR = path.join(process.cwd(), 'data');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
+// Ensure data directory exists (for local development)
+if (!isVercel && !fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Data file paths
+// Data file paths (for file system fallback)
 const DATA_FILES = {
   homePage: path.join(DATA_DIR, 'home-page.json'),
   aboutPage: path.join(DATA_DIR, 'about-page.json'),
@@ -29,7 +79,19 @@ const DATA_FILES = {
   globalSettings: path.join(DATA_DIR, 'global-settings.json'),
 };
 
-// Helper functions
+// KV keys
+const KV_KEYS = {
+  homePage: 'home-page',
+  aboutPage: 'about-page',
+  projects: 'projects',
+  services: 'services',
+  testimonials: 'testimonials',
+  teamMembers: 'team-members',
+  blogPosts: 'blog-posts',
+  globalSettings: 'global-settings',
+};
+
+// Helper functions for file system
 function readFile<T>(filePath: string, defaultValue: T): T {
   try {
     if (fs.existsSync(filePath)) {
@@ -51,11 +113,35 @@ function writeFile<T>(filePath: string, data: T): void {
   }
 }
 
+// Helper functions for KV
+async function readKV<T>(key: string, defaultValue: T): Promise<T> {
+  const kvInstance = await getKV();
+  if (!kvInstance) return defaultValue;
+  try {
+    const data = await kvInstance.get(key);
+    return data || defaultValue;
+  } catch (error) {
+    console.error(`Error reading KV ${key}:`, error);
+    return defaultValue;
+  }
+}
+
+async function writeKV<T>(key: string, data: T): Promise<void> {
+  const kvInstance = await getKV();
+  if (!kvInstance) throw new Error('KV not available');
+  try {
+    await kvInstance.set(key, data);
+  } catch (error) {
+    console.error(`Error writing KV ${key}:`, error);
+    throw error;
+  }
+}
+
 // Database operations
 export const db = {
   // Home Page (Single)
-  getHomePage() {
-    return readFile(DATA_FILES.homePage, {
+  async getHomePage() {
+    const defaultValue = {
       hero: {
         title: 'Building Digital Excellence',
         subtitle: 'We craft premium software solutions that transform businesses and delight users.',
@@ -68,17 +154,34 @@ export const db = {
         ctaText: 'Get Started',
         ctaLink: '/contact',
       },
-    });
+    };
+    
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.getHomePage();
+    }
+    if (kv) {
+      return await readKV(KV_KEYS.homePage, defaultValue);
+    }
+    return readFile(DATA_FILES.homePage, defaultValue);
   },
 
-  updateHomePage(data: any) {
-    writeFile(DATA_FILES.homePage, data);
+  async updateHomePage(data: any) {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.updateHomePage(data);
+    }
+    if (kv) {
+      await writeKV(KV_KEYS.homePage, data);
+    } else {
+      writeFile(DATA_FILES.homePage, data);
+    }
     return data;
   },
 
   // About Page (Single)
-  getAboutPage() {
-    return readFile(DATA_FILES.aboutPage, {
+  async getAboutPage() {
+    const defaultValue = {
       hero: {
         title: 'About ATECH',
         subtitle: 'We are a team of passionate developers, designers, and innovators dedicated to crafting exceptional digital experiences that transform businesses and delight users.',
@@ -153,31 +256,51 @@ export const db = {
           icon: 'rocket',
         },
       ],
-    });
+    };
+    
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.getAboutPage();
+    }
+    if (kv) {
+      return await readKV(KV_KEYS.aboutPage, defaultValue);
+    }
+    return readFile(DATA_FILES.aboutPage, defaultValue);
   },
 
-  updateAboutPage(data: any) {
-    writeFile(DATA_FILES.aboutPage, data);
+  async updateAboutPage(data: any) {
+    const supabase = await getSupabaseDb();
+    if (supabase) {
+      return await supabase.updateAboutPage(data);
+    }
+    if (kv) {
+      await writeKV(KV_KEYS.aboutPage, data);
+    } else {
+      writeFile(DATA_FILES.aboutPage, data);
+    }
     return data;
   },
 
   // Projects (Collection)
-  getProjects() {
+  async getProjects() {
+    if (kv) {
+      return await readKV<Array<any>>(KV_KEYS.projects, []);
+    }
     return readFile<Array<any>>(DATA_FILES.projects, []);
   },
 
-  getProject(id: string | number) {
-    const projects = this.getProjects();
+  async getProject(id: string | number) {
+    const projects = await this.getProjects();
     return projects.find((p: any) => p.id === id || p.id === Number(id));
   },
 
-  getProjectBySlug(slug: string) {
-    const projects = this.getProjects();
+  async getProjectBySlug(slug: string) {
+    const projects = await this.getProjects();
     return projects.find((p: any) => p.slug === slug);
   },
 
-  createProject(data: any) {
-    const projects = this.getProjects();
+  async createProject(data: any) {
+    const projects = await this.getProjects();
     const newProject = {
       id: Date.now(),
       ...data,
@@ -185,12 +308,16 @@ export const db = {
       updatedAt: new Date().toISOString(),
     };
     projects.push(newProject);
-    writeFile(DATA_FILES.projects, projects);
+    if (kv) {
+      await writeKV(KV_KEYS.projects, projects);
+    } else {
+      writeFile(DATA_FILES.projects, projects);
+    }
     return newProject;
   },
 
-  updateProject(id: string | number, data: any) {
-    const projects = this.getProjects();
+  async updateProject(id: string | number, data: any) {
+    const projects = await this.getProjects();
     const index = projects.findIndex((p: any) => p.id === id || p.id === Number(id));
     if (index === -1) throw new Error('Project not found');
     projects[index] = {
@@ -198,34 +325,45 @@ export const db = {
       ...data,
       updatedAt: new Date().toISOString(),
     };
-    writeFile(DATA_FILES.projects, projects);
+    if (kv) {
+      await writeKV(KV_KEYS.projects, projects);
+    } else {
+      writeFile(DATA_FILES.projects, projects);
+    }
     return projects[index];
   },
 
-  deleteProject(id: string | number) {
-    const projects = this.getProjects();
+  async deleteProject(id: string | number) {
+    const projects = await this.getProjects();
     const filtered = projects.filter((p: any) => p.id !== id && p.id !== Number(id));
-    writeFile(DATA_FILES.projects, filtered);
+    if (kv) {
+      await writeKV(KV_KEYS.projects, filtered);
+    } else {
+      writeFile(DATA_FILES.projects, filtered);
+    }
     return true;
   },
 
   // Services (Collection)
-  getServices() {
+  async getServices() {
+    if (kv) {
+      return await readKV<Array<any>>(KV_KEYS.services, []);
+    }
     return readFile<Array<any>>(DATA_FILES.services, []);
   },
 
-  getService(id: string | number) {
-    const services = this.getServices();
+  async getService(id: string | number) {
+    const services = await this.getServices();
     return services.find((s: any) => s.id === id || s.id === Number(id));
   },
 
-  getServiceBySlug(slug: string) {
-    const services = this.getServices();
+  async getServiceBySlug(slug: string) {
+    const services = await this.getServices();
     return services.find((s: any) => s.slug === slug);
   },
 
-  createService(data: any) {
-    const services = this.getServices();
+  async createService(data: any) {
+    const services = await this.getServices();
     const newService = {
       id: Date.now(),
       ...data,
@@ -233,12 +371,16 @@ export const db = {
       updatedAt: new Date().toISOString(),
     };
     services.push(newService);
-    writeFile(DATA_FILES.services, services);
+    if (kv) {
+      await writeKV(KV_KEYS.services, services);
+    } else {
+      writeFile(DATA_FILES.services, services);
+    }
     return newService;
   },
 
-  updateService(id: string | number, data: any) {
-    const services = this.getServices();
+  async updateService(id: string | number, data: any) {
+    const services = await this.getServices();
     const index = services.findIndex((s: any) => s.id === id || s.id === Number(id));
     if (index === -1) throw new Error('Service not found');
     services[index] = {
@@ -246,100 +388,141 @@ export const db = {
       ...data,
       updatedAt: new Date().toISOString(),
     };
-    writeFile(DATA_FILES.services, services);
+    if (kv) {
+      await writeKV(KV_KEYS.services, services);
+    } else {
+      writeFile(DATA_FILES.services, services);
+    }
     return services[index];
   },
 
-  deleteService(id: string | number) {
-    const services = this.getServices();
+  async deleteService(id: string | number) {
+    const services = await this.getServices();
     const filtered = services.filter((s: any) => s.id !== id && s.id !== Number(id));
-    writeFile(DATA_FILES.services, filtered);
+    if (kv) {
+      await writeKV(KV_KEYS.services, filtered);
+    } else {
+      writeFile(DATA_FILES.services, filtered);
+    }
     return true;
   },
 
   // Testimonials (Collection)
-  getTestimonials() {
+  async getTestimonials() {
+    if (kv) {
+      return await readKV<Array<any>>(KV_KEYS.testimonials, []);
+    }
     return readFile<Array<any>>(DATA_FILES.testimonials, []);
   },
 
-  createTestimonial(data: any) {
-    const testimonials = this.getTestimonials();
+  async createTestimonial(data: any) {
+    const testimonials = await this.getTestimonials();
     const newTestimonial = {
       id: Date.now(),
       ...data,
       createdAt: new Date().toISOString(),
     };
     testimonials.push(newTestimonial);
-    writeFile(DATA_FILES.testimonials, testimonials);
+    if (kv) {
+      await writeKV(KV_KEYS.testimonials, testimonials);
+    } else {
+      writeFile(DATA_FILES.testimonials, testimonials);
+    }
     return newTestimonial;
   },
 
-  updateTestimonial(id: string | number, data: any) {
-    const testimonials = this.getTestimonials();
+  async updateTestimonial(id: string | number, data: any) {
+    const testimonials = await this.getTestimonials();
     const index = testimonials.findIndex((t: any) => t.id === id || t.id === Number(id));
     if (index === -1) throw new Error('Testimonial not found');
     testimonials[index] = { ...testimonials[index], ...data };
-    writeFile(DATA_FILES.testimonials, testimonials);
+    if (kv) {
+      await writeKV(KV_KEYS.testimonials, testimonials);
+    } else {
+      writeFile(DATA_FILES.testimonials, testimonials);
+    }
     return testimonials[index];
   },
 
-  deleteTestimonial(id: string | number) {
-    const testimonials = this.getTestimonials();
+  async deleteTestimonial(id: string | number) {
+    const testimonials = await this.getTestimonials();
     const filtered = testimonials.filter((t: any) => t.id !== id && t.id !== Number(id));
-    writeFile(DATA_FILES.testimonials, filtered);
+    if (kv) {
+      await writeKV(KV_KEYS.testimonials, filtered);
+    } else {
+      writeFile(DATA_FILES.testimonials, filtered);
+    }
     return true;
   },
 
   // Team Members (Collection)
-  getTeamMembers() {
+  async getTeamMembers() {
+    if (kv) {
+      return await readKV<Array<any>>(KV_KEYS.teamMembers, []);
+    }
     return readFile<Array<any>>(DATA_FILES.teamMembers, []);
   },
 
-  createTeamMember(data: any) {
-    const members = this.getTeamMembers();
+  async createTeamMember(data: any) {
+    const members = await this.getTeamMembers();
     const newMember = {
       id: Date.now(),
       ...data,
       createdAt: new Date().toISOString(),
     };
     members.push(newMember);
-    writeFile(DATA_FILES.teamMembers, members);
+    if (kv) {
+      await writeKV(KV_KEYS.teamMembers, members);
+    } else {
+      writeFile(DATA_FILES.teamMembers, members);
+    }
     return newMember;
   },
 
-  updateTeamMember(id: string | number, data: any) {
-    const members = this.getTeamMembers();
+  async updateTeamMember(id: string | number, data: any) {
+    const members = await this.getTeamMembers();
     const index = members.findIndex((m: any) => m.id === id || m.id === Number(id));
     if (index === -1) throw new Error('Team member not found');
     members[index] = { ...members[index], ...data };
-    writeFile(DATA_FILES.teamMembers, members);
+    if (kv) {
+      await writeKV(KV_KEYS.teamMembers, members);
+    } else {
+      writeFile(DATA_FILES.teamMembers, members);
+    }
     return members[index];
   },
 
-  deleteTeamMember(id: string | number) {
-    const members = this.getTeamMembers();
+  async deleteTeamMember(id: string | number) {
+    const members = await this.getTeamMembers();
     const filtered = members.filter((m: any) => m.id !== id && m.id !== Number(id));
-    writeFile(DATA_FILES.teamMembers, filtered);
+    if (kv) {
+      await writeKV(KV_KEYS.teamMembers, filtered);
+    } else {
+      writeFile(DATA_FILES.teamMembers, filtered);
+    }
     return true;
   },
 
   // Blog Posts (Collection)
-  getBlogPosts() {
+  async getBlogPosts() {
+    if (kv) {
+      return await readKV<Array<any>>(KV_KEYS.blogPosts, []);
+    }
     return readFile<Array<any>>(DATA_FILES.blogPosts, []);
   },
 
-  getBlogPost(id: string | number) {
-    const posts = this.getBlogPosts();
+  async getBlogPost(id: string | number) {
+    const posts = await this.getBlogPosts();
     return posts.find((p: any) => p.id === id || p.id === Number(id));
   },
 
-  getBlogPostBySlug(slug: string) {
-    const posts = this.getBlogPosts();
+  async getBlogPostBySlug(slug: string) {
+    const posts = await this.getBlogPosts();
     return posts.find((p: any) => p.slug === slug);
   },
 
-  createBlogPost(data: any) {
-    const posts = this.getBlogPosts();
+  async createBlogPost(data: any) {
+    const posts = await this.getBlogPosts();
     const newPost = {
       id: Date.now(),
       ...data,
@@ -347,38 +530,57 @@ export const db = {
       createdAt: new Date().toISOString(),
     };
     posts.push(newPost);
-    writeFile(DATA_FILES.blogPosts, posts);
+    if (kv) {
+      await writeKV(KV_KEYS.blogPosts, posts);
+    } else {
+      writeFile(DATA_FILES.blogPosts, posts);
+    }
     return newPost;
   },
 
-  updateBlogPost(id: string | number, data: any) {
-    const posts = this.getBlogPosts();
+  async updateBlogPost(id: string | number, data: any) {
+    const posts = await this.getBlogPosts();
     const index = posts.findIndex((p: any) => p.id === id || p.id === Number(id));
     if (index === -1) throw new Error('Blog post not found');
     posts[index] = { ...posts[index], ...data };
-    writeFile(DATA_FILES.blogPosts, posts);
+    if (kv) {
+      await writeKV(KV_KEYS.blogPosts, posts);
+    } else {
+      writeFile(DATA_FILES.blogPosts, posts);
+    }
     return posts[index];
   },
 
-  deleteBlogPost(id: string | number) {
-    const posts = this.getBlogPosts();
+  async deleteBlogPost(id: string | number) {
+    const posts = await this.getBlogPosts();
     const filtered = posts.filter((p: any) => p.id !== id && p.id !== Number(id));
-    writeFile(DATA_FILES.blogPosts, filtered);
+    if (kv) {
+      await writeKV(KV_KEYS.blogPosts, filtered);
+    } else {
+      writeFile(DATA_FILES.blogPosts, filtered);
+    }
     return true;
   },
 
   // Global Settings (Single)
-  getGlobalSettings() {
-    return readFile(DATA_FILES.globalSettings, {
+  async getGlobalSettings() {
+    const defaultValue = {
       siteName: 'ATECH',
       socialLinks: {},
       seoDefaults: {},
-    });
+    };
+    if (kv) {
+      return await readKV(KV_KEYS.globalSettings, defaultValue);
+    }
+    return readFile(DATA_FILES.globalSettings, defaultValue);
   },
 
-  updateGlobalSettings(data: any) {
-    writeFile(DATA_FILES.globalSettings, data);
+  async updateGlobalSettings(data: any) {
+    if (kv) {
+      await writeKV(KV_KEYS.globalSettings, data);
+    } else {
+      writeFile(DATA_FILES.globalSettings, data);
+    }
     return data;
   },
 };
-

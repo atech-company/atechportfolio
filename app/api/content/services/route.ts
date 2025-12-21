@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const slug = searchParams.get('slug');
 
-    let services = db.getServices();
+    let services = await db.getServices();
 
     if (slug) {
       const service = services.find((s: any) => s.slug === slug);

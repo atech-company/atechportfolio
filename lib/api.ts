@@ -136,7 +136,7 @@ export async function fetchHomePage(): Promise<HomePage | null> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? database.getHomePage() : null;
+    return database ? await database.getHomePage() : null;
   }
   const data = await fetchAPI<HomePage>("/api/content/home-page");
   return data;
@@ -149,7 +149,7 @@ export async function fetchAboutPage(): Promise<any | null> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? database.getAboutPage() : null;
+    return database ? await database.getAboutPage() : null;
   }
   const data = await fetchAPI<any>("/api/content/about-page");
   return data;
@@ -162,7 +162,7 @@ export async function fetchServices(): Promise<Service[]> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? database.getServices() : [];
+    return database ? await database.getServices() : [];
   }
   const data = await fetchAPI<Service[]>("/api/content/services");
   if (!data) return [];
@@ -177,7 +177,7 @@ export async function fetchService(slug: string): Promise<Service | null> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? (database.getServiceBySlug(slug) || null) : null;
+    return database ? (await database.getServiceBySlug(slug) || null) : null;
   }
   const data = await fetchAPI<Service>(`/api/content/services?slug=${slug}`);
   return data || null;
@@ -196,7 +196,7 @@ export async function fetchProjects(options?: {
     const database = await getDb();
     if (!database) return [];
     
-    let projects = database.getProjects();
+    let projects = await database.getProjects();
     
     // Apply filters
     if (options?.slug) {
@@ -293,7 +293,7 @@ export async function fetchProject(slug: string): Promise<Project | null> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? (database.getProjectBySlug(slug) || null) : null;
+    return database ? (await database.getProjectBySlug(slug) || null) : null;
   }
   
   const data = await fetchAPI<any>(`/api/content/projects?slug=${slug}`);
@@ -344,7 +344,7 @@ export async function fetchTestimonials(limit?: number): Promise<Testimonial[]> 
     const database = await getDb();
     if (!database) return [];
     
-    let testimonials = database.getTestimonials();
+    let testimonials = await database.getTestimonials();
     if (limit) {
       testimonials = testimonials.slice(0, limit);
     }
@@ -366,7 +366,7 @@ export async function fetchTeamMembers(): Promise<TeamMember[]> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? database.getTeamMembers() : [];
+    return database ? await database.getTeamMembers() : [];
   }
   
   const data = await fetchAPI<TeamMember[]>("/api/content/team-members");
@@ -386,7 +386,7 @@ export async function fetchBlogPosts(options?: {
     const database = await getDb();
     if (!database) return [];
     
-    let posts = database.getBlogPosts();
+    let posts = await database.getBlogPosts();
     
     if (options?.slug) {
       const post = posts.find((p: any) => p.slug === options.slug);
@@ -444,7 +444,7 @@ export async function fetchGlobalSettings(): Promise<GlobalSettings | null> {
   // During build time, read directly from files
   if (isBuildTime()) {
     const database = await getDb();
-    return database ? database.getGlobalSettings() : null;
+    return database ? await database.getGlobalSettings() : null;
   }
   
   const data = await fetchAPI<GlobalSettings>("/api/content/global-settings");

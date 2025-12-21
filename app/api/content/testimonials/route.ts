@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const limit = searchParams.get('limit');
     
-    let testimonials = db.getTestimonials();
+    let testimonials = await db.getTestimonials();
     
     if (limit) {
       testimonials = testimonials.slice(0, Number(limit));

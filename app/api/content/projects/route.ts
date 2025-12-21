@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit');
     const slug = searchParams.get('slug');
 
-    let projects = db.getProjects();
+    let projects = await db.getProjects();
 
     if (featured === 'true') {
       projects = projects.filter((p: any) => p.featured === true);

@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit');
     const slug = searchParams.get('slug');
 
-    let projects = db.getProjects();
+    let projects = await db.getProjects();
 
     if (featured === 'true') {
       projects = projects.filter((p: any) => p.featured === true);
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const project = db.createProject(body);
+    const project = await db.createProject(body);
     return NextResponse.json({ data: project }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

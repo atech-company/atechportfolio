@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const project = db.getProject(params.id);
+    const project = await db.getProject(params.id);
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
@@ -24,7 +24,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const project = db.updateProject(params.id, body);
+    const project = await db.updateProject(params.id, body);
     return NextResponse.json({ data: project });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -37,7 +37,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    db.deleteProject(params.id);
+    await db.deleteProject(params.id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

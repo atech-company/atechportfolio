@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get('slug');
     const category = searchParams.get('category');
     
-    let posts = db.getBlogPosts();
+    let posts = await db.getBlogPosts();
     
     // Sort by publishedAt descending
     posts.sort((a: any, b: any) => {
