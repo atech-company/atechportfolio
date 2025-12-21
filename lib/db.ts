@@ -21,22 +21,27 @@ async function getSupabaseDb() {
   }
   try {
     const { isSupabaseConfigured, supabaseAdmin } = await import('./supabase');
+    console.log('[DB] Supabase check:', {
+      isSupabaseConfigured,
+      hasSupabaseAdmin: !!supabaseAdmin,
+    });
     // Need both isSupabaseConfigured AND supabaseAdmin (which requires service role key)
     if (isSupabaseConfigured && supabaseAdmin) {
       const dbModule = await import('./supabase-db');
       supabaseDb = dbModule.supabaseDb;
+      console.log('[DB] Supabase DB initialized successfully');
     } else {
       // Log why Supabase DB is not available
       if (!isSupabaseConfigured) {
-        console.warn('Supabase is not configured. Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+        console.warn('[DB] Supabase is not configured. Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
       } else if (!supabaseAdmin) {
-        console.warn('Supabase service role key is missing. SUPABASE_SERVICE_ROLE_KEY is required for database operations.');
+        console.warn('[DB] Supabase service role key is missing. SUPABASE_SERVICE_ROLE_KEY is required for database operations.');
       }
     }
     supabaseDbInitialized = true;
     return supabaseDb;
   } catch (e) {
-    console.warn('Supabase DB not available, using file system:', e);
+    console.warn('[DB] Supabase DB not available, using file system:', e);
     supabaseDbInitialized = true;
     return null;
   }
@@ -291,13 +296,17 @@ export const db = {
 
   // Projects (Collection)
   async getProjects() {
+    console.log('[DB] getProjects called');
     const supabase = await getSupabaseDb();
     if (supabase) {
+      console.log('[DB] Using Supabase for projects');
       return await supabase.getProjects();
     }
     if (kv) {
+      console.log('[DB] Using Vercel KV for projects');
       return await readKV<Array<any>>(KV_KEYS.projects, []);
     }
+    console.log('[DB] Using file system for projects');
     return readFile<Array<any>>(DATA_FILES.projects, []);
   },
 

@@ -14,18 +14,35 @@ if (!isSupabaseConfigured) {
 export const supabaseDb = {
   // Projects
   async getProjects() {
-    if (!isSupabaseConfigured || !supabaseAdmin) return [];
+    if (!isSupabaseConfigured || !supabaseAdmin) {
+      console.warn('[Supabase DB] Supabase not configured or admin client not available');
+      return [];
+    }
+    
+    console.log('[Supabase DB] Fetching projects from Supabase...');
     const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) {
-      console.error('Error fetching projects:', error);
+      console.error('[Supabase DB] Error fetching projects:', error);
       return [];
     }
     
-    return (data || []).map(transformProject);
+    console.log('[Supabase DB] Projects fetched:', data?.length || 0);
+    if (data && data.length > 0) {
+      console.log('[Supabase DB] First project from DB:', {
+        id: data[0].id,
+        title: data[0].title,
+        thumbnail: data[0].thumbnail,
+      });
+    }
+    
+    const transformed = (data || []).map(transformProject);
+    console.log('[Supabase DB] Transformed projects:', transformed.length);
+    
+    return transformed;
   },
 
   async getProject(id: string | number) {

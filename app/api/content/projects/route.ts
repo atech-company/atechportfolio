@@ -10,6 +10,17 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get('slug');
 
     let projects = await db.getProjects();
+    
+    // Debug logging
+    console.log('[Projects API] Total projects fetched:', projects.length);
+    if (projects.length > 0) {
+      console.log('[Projects API] First project sample:', {
+        id: projects[0].id,
+        title: projects[0].title,
+        thumbnail: projects[0].thumbnail,
+        hasImages: !!projects[0].images,
+      });
+    }
 
     if (featured === 'true') {
       projects = projects.filter((p: any) => p.featured === true);
