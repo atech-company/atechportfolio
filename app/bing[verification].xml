@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+  Bing Webmaster Tools Verification
+  This file handles Bing Webmaster Tools verification
+  
+  To verify:
+  1. Go to Bing Webmaster Tools: https://www.bing.com/webmasters
+  2. Add your site
+  3. Choose "XML file" verification method
+  4. Download the XML file and replace this content
+  5. Or use the meta tag method (set BING_SITE_VERIFICATION in .env)
+-->
+<users>
+  <user>BING_VERIFICATION_CODE</user>
+</users>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+  Bing Webmaster Tools Verification File
+  Replace this content with the XML file downloaded from Bing Webmaster Tools
+  
+  Steps:
+  1. Go to https://www.bing.com/webmasters
+  2. Add your site
+  3. Choose "XML file" verification method
+  4. Download the XML file
+  5. Replace this file's content with the downloaded content
+  6. Upload to your server
+  7. Verify in Bing Webmaster Tools
+-->
+<users>
+  <user>REPLACE_WITH_BING_VERIFICATION_CODE</user>
+</users>
+

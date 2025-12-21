@@ -133,9 +133,39 @@ export default function RootLayout({
     },
   };
 
+  // Google Search Console Verification
+  const googleVerification = process.env.GOOGLE_SITE_VERIFICATION;
+  
+  // Bing Webmaster Tools Verification
+  const bingVerification = process.env.BING_SITE_VERIFICATION;
+
   return (
     <html lang="en">
       <head>
+        {/* Google Search Console Verification */}
+        {googleVerification && (
+          <meta
+            name="google-site-verification"
+            content={googleVerification}
+          />
+        )}
+        
+        {/* Bing Webmaster Tools Verification */}
+        {bingVerification && (
+          <meta
+            name="msvalidate.01"
+            content={bingVerification}
+          />
+        )}
+        
+        {/* Yandex Webmaster Verification (Optional) */}
+        {process.env.YANDEX_VERIFICATION && (
+          <meta
+            name="yandex-verification"
+            content={process.env.YANDEX_VERIFICATION}
+          />
+        )}
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
