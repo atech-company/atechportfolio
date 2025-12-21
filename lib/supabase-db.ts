@@ -68,15 +68,18 @@ export const supabaseDb = {
     const { data, error } = await supabaseAdmin
       .from('projects')
       .insert(transformProjectToDb(projectData))
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error creating project:', error);
       throw error;
     }
     
-    return transformProject(data);
+    if (!data || data.length === 0) {
+      throw new Error('Failed to create project: No data returned');
+    }
+    
+    return transformProject(data[0]);
   },
 
   async updateProject(id: string | number, projectData: any) {
@@ -88,15 +91,18 @@ export const supabaseDb = {
       .from('projects')
       .update(transformProjectToDb(projectData))
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating project:', error);
       throw error;
     }
     
-    return transformProject(data);
+    if (!data || data.length === 0) {
+      throw new Error('Project not found');
+    }
+    
+    return transformProject(data[0]);
   },
 
   async deleteProject(id: string | number) {
@@ -193,15 +199,18 @@ export const supabaseDb = {
       .from('services')
       .update(transformServiceToDb(serviceData))
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating service:', error);
       throw error;
     }
     
-    return transformService(data);
+    if (!data || data.length === 0) {
+      throw new Error('Service not found');
+    }
+    
+    return transformService(data[0]);
   },
 
   async deleteService(id: string | number) {
@@ -278,15 +287,18 @@ export const supabaseDb = {
     const { data, error } = await supabaseAdmin
       .from('blog_posts')
       .insert(transformBlogPostToDb(postData))
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error creating blog post:', error);
       throw error;
     }
     
-    return transformBlogPost(data);
+    if (!data || data.length === 0) {
+      throw new Error('Failed to create blog post: No data returned');
+    }
+    
+    return transformBlogPost(data[0]);
   },
 
   async updateBlogPost(id: string | number, postData: any) {
@@ -298,15 +310,18 @@ export const supabaseDb = {
       .from('blog_posts')
       .update(transformBlogPostToDb(postData))
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating blog post:', error);
       throw error;
     }
     
-    return transformBlogPost(data);
+    if (!data || data.length === 0) {
+      throw new Error('Blog post not found');
+    }
+    
+    return transformBlogPost(data[0]);
   },
 
   async deleteBlogPost(id: string | number) {
@@ -351,15 +366,18 @@ export const supabaseDb = {
     const { data, error } = await supabaseAdmin
       .from('testimonials')
       .insert(transformTestimonialToDb(testimonialData))
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error creating testimonial:', error);
       throw error;
     }
     
-    return transformTestimonial(data);
+    if (!data || data.length === 0) {
+      throw new Error('Failed to create testimonial: No data returned');
+    }
+    
+    return transformTestimonial(data[0]);
   },
 
   async updateTestimonial(id: string | number, testimonialData: any) {
@@ -371,15 +389,18 @@ export const supabaseDb = {
       .from('testimonials')
       .update(transformTestimonialToDb(testimonialData))
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating testimonial:', error);
       throw error;
     }
     
-    return transformTestimonial(data);
+    if (!data || data.length === 0) {
+      throw new Error('Testimonial not found');
+    }
+    
+    return transformTestimonial(data[0]);
   },
 
   async deleteTestimonial(id: string | number) {
@@ -424,15 +445,18 @@ export const supabaseDb = {
     const { data, error } = await supabaseAdmin
       .from('team_members')
       .insert(transformTeamMemberToDb(memberData))
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error creating team member:', error);
       throw error;
     }
     
-    return transformTeamMember(data);
+    if (!data || data.length === 0) {
+      throw new Error('Failed to create team member: No data returned');
+    }
+    
+    return transformTeamMember(data[0]);
   },
 
   async updateTeamMember(id: string | number, memberData: any) {
@@ -444,15 +468,18 @@ export const supabaseDb = {
       .from('team_members')
       .update(transformTeamMemberToDb(memberData))
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating team member:', error);
       throw error;
     }
     
-    return transformTeamMember(data);
+    if (!data || data.length === 0) {
+      throw new Error('Team member not found');
+    }
+    
+    return transformTeamMember(data[0]);
   },
 
   async deleteTeamMember(id: string | number) {
@@ -507,17 +534,20 @@ export const supabaseDb = {
         hero: pageData.hero,
         cta: pageData.cta,
       })
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating home page:', error);
       throw error;
     }
     
+    if (!data || data.length === 0) {
+      throw new Error('Failed to update home page: No data returned');
+    }
+    
     return {
-      hero: data.hero,
-      cta: data.cta,
+      hero: data[0].hero,
+      cta: data[0].cta,
     };
   },
 
@@ -561,20 +591,23 @@ export const supabaseDb = {
         values: pageData.values || [],
         timeline: pageData.timeline || [],
       })
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating about page:', error);
       throw error;
     }
     
+    if (!data || data.length === 0) {
+      throw new Error('Failed to update about page: No data returned');
+    }
+    
     return {
-      hero: data.hero,
-      mission: data.mission,
-      vision: data.vision,
-      values: data.values || [],
-      timeline: data.timeline || [],
+      hero: data[0].hero,
+      mission: data[0].mission,
+      vision: data[0].vision,
+      values: data[0].values || [],
+      timeline: data[0].timeline || [],
     };
   },
 
@@ -614,18 +647,21 @@ export const supabaseDb = {
         social_links: settingsData.socialLinks || {},
         seo_defaults: settingsData.seoDefaults || {},
       })
-      .select()
-      .single();
+      .select();
     
     if (error) {
       console.error('Error updating global settings:', error);
       throw error;
     }
     
+    if (!data || data.length === 0) {
+      throw new Error('Failed to update global settings: No data returned');
+    }
+    
     return {
-      siteName: data.site_name,
-      socialLinks: data.social_links || {},
-      seoDefaults: data.seo_defaults || {},
+      siteName: data[0].site_name,
+      socialLinks: data[0].social_links || {},
+      seoDefaults: data[0].seo_defaults || {},
     };
   },
 };
