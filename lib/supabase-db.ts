@@ -23,7 +23,7 @@ export const supabaseDb = {
     const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false, nullsFirst: false });
     
     if (error) {
       console.error('[Supabase DB] Error fetching projects:', error);
