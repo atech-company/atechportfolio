@@ -213,7 +213,10 @@ export async function fetchProjects(options?: {
     }
     
     if (options?.featured) {
-      projects = projects.filter((p: any) => p.featured === true);
+      projects = projects.filter((p: any) => {
+        // Handle boolean, string, and number values
+        return p.featured === true || p.featured === 'true' || p.featured === 1 || p.featured === '1';
+      });
     }
     
     if (options?.limit) {

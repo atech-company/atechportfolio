@@ -36,10 +36,18 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [homePage, services, projects] = await Promise.all([
+  // First, try to get featured projects
+  let projects = await fetchProjects({ featured: true, limit: 6 });
+  
+  // If no featured projects, show all projects instead
+  if (!projects || projects.length === 0) {
+    console.log('[Home Page] No featured projects found, fetching all projects');
+    projects = await fetchProjects({ limit: 6 });
+  }
+
+  const [homePage, services] = await Promise.all([
     fetchHomePage(),
     fetchServices(),
-    fetchProjects({ featured: true, limit: 6 }),
   ]);
 
   // Debug logging
