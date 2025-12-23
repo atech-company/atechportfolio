@@ -260,6 +260,7 @@ export async function fetchProjects(options?: {
     endpoint += `?${params.join("&")}`;
   }
 
+  console.log('[fetchProjects] Calling fetchAPI with endpoint:', endpoint);
   const data = await fetchAPI<any[]>(endpoint);
   console.log('[fetchProjects] API response:', {
     hasData: !!data,
@@ -267,7 +268,7 @@ export async function fetchProjects(options?: {
     length: Array.isArray(data) ? data.length : 'not array',
     firstItem: Array.isArray(data) && data.length > 0 ? JSON.stringify(data[0]).substring(0, 200) : null,
     dataType: typeof data,
-    fullData: JSON.stringify(data).substring(0, 1000), // First 1000 chars
+    fullData: data ? JSON.stringify(data).substring(0, 1000) : 'null/undefined', // First 1000 chars
   });
   
   if (!data) {

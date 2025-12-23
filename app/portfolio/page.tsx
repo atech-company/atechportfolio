@@ -32,7 +32,14 @@ export const revalidate = 0; // Always fetch fresh data - no caching
 export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export default async function PortfolioPage() {
+  console.log('[Portfolio Page] Starting to fetch projects...');
   const projects = await fetchProjects();
+  console.log('[Portfolio Page] fetchProjects returned:', {
+    type: typeof projects,
+    isArray: Array.isArray(projects),
+    length: Array.isArray(projects) ? projects.length : 'not array',
+    value: projects,
+  });
 
   // Debug logging
   console.log('[Portfolio Page] Projects received:', {
@@ -49,6 +56,25 @@ export default async function PortfolioPage() {
   if (!projects || projects.length === 0) {
     console.error('[Portfolio Page] WARNING: No projects received from fetchProjects');
     console.error('[Portfolio Page] Projects value:', projects);
+    console.error('[Portfolio Page] Projects type:', typeof projects);
+    console.error('[Portfolio Page] Is array:', Array.isArray(projects));
+    
+    // Try direct database call as fallback
+    try {
+      const { db } = await import('@/lib/db');
+      const directProjects = await db.getProjects();
+      console.log('[Portfolio Page] Direct DB call returned:', directProjects.length, 'projects');
+      if (directProjects.length > 0) {
+        return (
+          <>
+            <PortfolioHero />
+            <ProjectsGrid projects={directProjects} />
+          </>
+        );
+      }
+    } catch (err) {
+      console.error('[Portfolio Page] Direct DB call failed:', err);
+    }
   } else {
     console.log('[Portfolio Page] First project details:', {
       id: projects[0]?.id,
