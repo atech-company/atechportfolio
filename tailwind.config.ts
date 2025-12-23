@@ -22,8 +22,15 @@ const config: Config = {
           900: "#0c4a6e",
         },
         neon: {
-          blue: "#00f0ff",
+          blue: "#00d9ff",
           green: "#00ff88",
+          cyan: "#00f0ff",
+        },
+        accent: {
+          blue: "#3b82f6",
+          cyan: "#06b6d4",
+          green: "#10b981",
+          purple: "#8b5cf6",
         },
         dark: {
           50: "#f8f9fa",
@@ -71,8 +78,8 @@ const config: Config = {
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
         glow: {
-          "0%": { boxShadow: "0 0 5px #00f0ff, 0 0 10px #00f0ff" },
-          "100%": { boxShadow: "0 0 20px #00f0ff, 0 0 30px #00f0ff, 0 0 40px #00ff88" },
+          "0%": { boxShadow: "0 0 5px #00d9ff, 0 0 10px #3b82f6" },
+          "100%": { boxShadow: "0 0 20px #00d9ff, 0 0 30px #3b82f6, 0 0 40px #00ff88" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
@@ -114,17 +121,17 @@ const config: Config = {
         },
         glowPulse: {
           "0%": {
-            "box-shadow": "0 0 5px rgba(0, 240, 255, 0.5), 0 0 10px rgba(0, 240, 255, 0.3)",
+            "box-shadow": "0 0 5px rgba(0, 217, 255, 0.6), 0 0 10px rgba(59, 130, 246, 0.4)",
           },
           "100%": {
-            "box-shadow": "0 0 20px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 255, 136, 0.4)",
+            "box-shadow": "0 0 20px rgba(0, 217, 255, 0.9), 0 0 30px rgba(59, 130, 246, 0.7), 0 0 40px rgba(0, 255, 136, 0.5)",
           },
         },
       },
       boxShadow: {
-        "neon-blue": "0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3)",
-        "neon-green": "0 0 10px rgba(0, 255, 136, 0.5), 0 0 20px rgba(0, 255, 136, 0.3)",
-        "neon-glow": "0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 255, 136, 0.2)",
+        "neon-blue": "0 0 10px rgba(0, 217, 255, 0.6), 0 0 20px rgba(59, 130, 246, 0.4)",
+        "neon-green": "0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(16, 185, 129, 0.4)",
+        "neon-glow": "0 0 20px rgba(0, 217, 255, 0.6), 0 0 40px rgba(59, 130, 246, 0.4), 0 0 60px rgba(0, 255, 136, 0.3)",
       },
     },
   },

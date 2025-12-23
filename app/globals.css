@@ -44,8 +44,8 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0, 217, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 0;
@@ -82,14 +82,14 @@ body::before {
 
   .glass-hover:hover {
     background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(0, 240, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.2),
-                inset 0 0 0 1px rgba(0, 240, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 217, 255, 0.25),
+                inset 0 0 0 1px rgba(59, 130, 246, 0.3);
     transform: translateY(-2px);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #00f0ff 0%, #00ff88 50%, #00f0ff 100%);
+    background: linear-gradient(135deg, #00d9ff 0%, #3b82f6 25%, #00ff88 50%, #06b6d4 75%, #00d9ff 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -103,30 +103,30 @@ body::before {
   }
 
   .neon-glow {
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5),
-                 0 0 20px rgba(0, 240, 255, 0.3),
-                 0 0 30px rgba(0, 240, 255, 0.2),
-                 0 0 40px rgba(0, 255, 136, 0.1);
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6),
+                 0 0 20px rgba(59, 130, 246, 0.4),
+                 0 0 30px rgba(0, 217, 255, 0.3),
+                 0 0 40px rgba(0, 255, 136, 0.2);
     animation: glowPulse 2s ease-in-out infinite alternate;
   }
 
   @keyframes glowPulse {
     from {
-      text-shadow: 0 0 10px rgba(0, 240, 255, 0.5),
-                   0 0 20px rgba(0, 240, 255, 0.3),
-                   0 0 30px rgba(0, 240, 255, 0.2);
+      text-shadow: 0 0 10px rgba(0, 217, 255, 0.6),
+                   0 0 20px rgba(59, 130, 246, 0.4),
+                   0 0 30px rgba(0, 217, 255, 0.3);
     }
     to {
-      text-shadow: 0 0 20px rgba(0, 240, 255, 0.8),
-                   0 0 30px rgba(0, 240, 255, 0.6),
-                   0 0 40px rgba(0, 240, 255, 0.4),
-                   0 0 50px rgba(0, 255, 136, 0.3);
+      text-shadow: 0 0 20px rgba(0, 217, 255, 0.9),
+                   0 0 30px rgba(59, 130, 246, 0.7),
+                   0 0 40px rgba(0, 217, 255, 0.5),
+                   0 0 50px rgba(0, 255, 136, 0.4);
     }
   }
 
   .gradient-border {
     position: relative;
-    background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 255, 136, 0.1));
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(59, 130, 246, 0.15), rgba(0, 255, 136, 0.15));
     border-radius: 12px;
     padding: 2px;
   }
@@ -137,7 +137,7 @@ body::before {
     inset: 0;
     border-radius: 12px;
     padding: 2px;
-    background: linear-gradient(135deg, #00f0ff, #00ff88);
+    background: linear-gradient(135deg, #00d9ff, #3b82f6, #00ff88);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -222,30 +222,30 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00f0ff, #00ff88);
+  background: linear-gradient(180deg, #00d9ff, #3b82f6, #00ff88);
   border-radius: 6px;
   border: 2px solid #0d1117;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #00ff88, #00f0ff);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  background: linear-gradient(180deg, #00ff88, #3b82f6, #00d9ff);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.6);
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(0, 240, 255, 0.3);
+  background: rgba(0, 217, 255, 0.35);
   color: #fff;
 }
 
 ::-moz-selection {
-  background: rgba(0, 240, 255, 0.3);
+  background: rgba(0, 217, 255, 0.35);
   color: #fff;
 }
 
 /* Smooth focus styles */
 *:focus-visible {
-  outline: 2px solid rgba(0, 240, 255, 0.5);
+  outline: 2px solid rgba(0, 217, 255, 0.6);
   outline-offset: 2px;
   border-radius: 4px;
 }

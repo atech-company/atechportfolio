@@ -52,7 +52,7 @@ export default function Header() {
             >
               <span className="relative z-10">ATECH</span>
               {/* Subtle glow on hover without blur */}
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-blue/30 to-neon-green/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" 
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-blue/40 via-accent-blue/30 to-neon-green/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" 
                    style={{ filter: 'blur(8px)', transform: 'scale(1.1)' }} />
             </motion.div>
           </Link>
