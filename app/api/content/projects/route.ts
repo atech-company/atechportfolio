@@ -52,8 +52,26 @@ export async function GET(request: NextRequest) {
     }
 
     if (slug) {
-      const project = projects.find((p: any) => p.slug === slug);
+      console.log('[Projects API] Searching for project with slug:', slug);
+      console.log('[Projects API] Available slugs:', projects.map((p: any) => p.slug));
+      
+      // Try exact match first
+      let project = projects.find((p: any) => p.slug === slug);
+      
+      // If not found, try case-insensitive match
+      if (!project) {
+        console.log('[Projects API] Exact match not found, trying case-insensitive match');
+        project = projects.find((p: any) => 
+          p.slug && slug && p.slug.toLowerCase() === slug.toLowerCase()
+        );
+      }
+      
       if (project) {
+        console.log('[Projects API] Project found:', {
+          id: project.id,
+          title: project.title,
+          slug: project.slug,
+        });
         // Transform to match Strapi format for single project
         return NextResponse.json({
           data: {
@@ -67,6 +85,10 @@ export async function GET(request: NextRequest) {
         });
       }
       console.warn('[Projects API] Project not found for slug:', slug);
+      console.warn('[Projects API] Available slugs:', projects.map((p: any) => ({
+        slug: p.slug,
+        title: p.title,
+      })));
       return NextResponse.json({ data: null });
     }
 

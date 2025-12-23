@@ -88,16 +88,52 @@ export default async function ProjectPage({
   params: { slug: string };
 }) {
   try {
-    const project = await fetchProject(params.slug);
+    console.log(`[Project Page] Fetching project with slug: ${params.slug}`);
+    let project = await fetchProject(params.slug);
+
+    // If project not found via API, try direct database call
+    if (!project) {
+      console.log(`[Project Page] Project not found via API, trying direct DB call for slug: ${params.slug}`);
+      try {
+        const { db } = await import('@/lib/db');
+        const allProjects = await db.getProjects();
+        console.log(`[Project Page] Direct DB call - all projects:`, {
+          count: allProjects.length,
+          slugs: allProjects.map((p: any) => p.slug),
+        });
+        
+        const foundProject = allProjects.find((p: any) => p.slug === params.slug);
+        if (foundProject) {
+          console.log(`[Project Page] Found project via direct DB call:`, {
+            id: foundProject.id,
+            title: foundProject.title,
+            slug: foundProject.slug,
+          });
+          project = foundProject;
+        } else {
+          console.warn(`[Project Page] Project not found in database for slug: ${params.slug}`);
+          console.warn(`[Project Page] Available slugs:`, allProjects.map((p: any) => p.slug));
+        }
+      } catch (dbError: any) {
+        console.error(`[Project Page] Error in direct DB fallback:`, dbError);
+      }
+    }
 
     if (!project) {
       console.warn(`[Project Page] Project not found for slug: ${params.slug}`);
       notFound();
     }
 
+    console.log(`[Project Page] Project found, rendering detail page:`, {
+      id: project.id,
+      title: project.title,
+      slug: project.slug,
+    });
+
     return <ProjectDetail project={project} />;
   } catch (error: any) {
     console.error(`[Project Page] Error fetching project with slug ${params.slug}:`, error);
+    console.error(`[Project Page] Error stack:`, error.stack);
     notFound();
   }
 }
