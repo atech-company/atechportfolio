@@ -20,29 +20,45 @@ export const supabaseDb = {
     }
     
     console.log('[Supabase DB] Fetching projects from Supabase...');
-    const { data, error } = await supabaseAdmin
-      .from('projects')
-      .select('*')
-      .order('created_at', { ascending: false, nullsFirst: false });
-    
-    if (error) {
-      console.error('[Supabase DB] Error fetching projects:', error);
-      return [];
-    }
-    
-    console.log('[Supabase DB] Projects fetched:', data?.length || 0);
-    if (data && data.length > 0) {
-      console.log('[Supabase DB] First project from DB:', {
-        id: data[0].id,
-        title: data[0].title,
-        thumbnail: data[0].thumbnail,
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false, nullsFirst: false });
+      
+      if (error) {
+        console.error('[Supabase DB] Error fetching projects:', error);
+        console.error('[Supabase DB] Error details:', JSON.stringify(error, null, 2));
+        return [];
+      }
+      
+      console.log('[Supabase DB] Raw data from Supabase:', {
+        count: data?.length || 0,
+        data: data,
       });
-    }
-    
-    const transformed = (data || []).map(transformProject);
+      
+      if (!data || data.length === 0) {
+        console.warn('[Supabase DB] No projects found in Supabase');
+        return [];
+      }
+      
+      console.log('[Supabase DB] First project raw data:', JSON.stringify(data[0], null, 2));
+      
+    const transformed = data
+      .map(transformProject)
+      .filter((p: any) => p !== null); // Filter out any null transformations
+      
     console.log('[Supabase DB] Transformed projects:', transformed.length);
+    if (transformed.length > 0) {
+      console.log('[Supabase DB] First transformed project:', JSON.stringify(transformed[0], null, 2));
+    }
     
     return transformed;
+    } catch (err: any) {
+      console.error('[Supabase DB] Exception in getProjects:', err);
+      console.error('[Supabase DB] Exception stack:', err.stack);
+      return [];
+    }
   },
 
   async getProject(id: string | number) {
@@ -685,20 +701,40 @@ export const supabaseDb = {
 
 // Transform functions - Database to App format
 function transformProject(dbProject: any) {
-  return {
-    id: dbProject.id,
-    title: dbProject.title,
-    slug: dbProject.slug,
-    description: dbProject.description,
-    featured: dbProject.featured || false,
-    techStack: dbProject.tech_stack || [],
-    projectUrl: dbProject.project_url,
-    githubUrl: dbProject.github_url,
-    thumbnail: dbProject.thumbnail,
-    images: Array.isArray(dbProject.images) ? dbProject.images : [],
-    createdAt: dbProject.created_at,
-    updatedAt: dbProject.updated_at,
-  };
+  if (!dbProject) {
+    console.warn('[Transform] Received null/undefined project');
+    return null;
+  }
+  
+  try {
+    const transformed = {
+      id: dbProject.id,
+      title: dbProject.title || '',
+      slug: dbProject.slug || '',
+      description: dbProject.description || '',
+      featured: dbProject.featured === true || dbProject.featured === 'true' || false,
+      techStack: Array.isArray(dbProject.tech_stack) ? dbProject.tech_stack : (dbProject.tech_stack ? [dbProject.tech_stack] : []),
+      projectUrl: dbProject.project_url || null,
+      githubUrl: dbProject.github_url || null,
+      thumbnail: dbProject.thumbnail || null,
+      images: Array.isArray(dbProject.images) ? dbProject.images : (dbProject.images ? [dbProject.images] : []),
+      createdAt: dbProject.created_at || new Date().toISOString(),
+      updatedAt: dbProject.updated_at || new Date().toISOString(),
+    };
+    
+    console.log('[Transform] Project transformed:', {
+      id: transformed.id,
+      title: transformed.title,
+      slug: transformed.slug,
+      featured: transformed.featured,
+    });
+    
+    return transformed;
+  } catch (err: any) {
+    console.error('[Transform] Error transforming project:', err);
+    console.error('[Transform] Raw project data:', JSON.stringify(dbProject, null, 2));
+    return null;
+  }
 }
 
 function transformProjectToDb(project: any) {
