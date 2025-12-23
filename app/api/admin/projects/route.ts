@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+// Force dynamic rendering and no caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET all projects
 export async function GET(request: NextRequest) {
   try {
@@ -44,10 +48,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('[Admin Projects API] Creating project:', {
+      title: body.title,
+      slug: body.slug,
+      featured: body.featured,
+    });
+    
     const project = await db.createProject(body);
+    
+    console.log('[Admin Projects API] Project created successfully:', {
+      id: project.id,
+      title: project.title,
+    });
+    
+    // Verify the project was saved by fetching all projects
+    const allProjects = await db.getProjects();
+    console.log('[Admin Projects API] Total projects after creation:', allProjects.length);
+    
     return NextResponse.json({ data: project }, { status: 201 });
   } catch (error: any) {
-    console.error('Create project error:', error);
+    console.error('[Admin Projects API] Create project error:', error);
     const statusCode = error.message.includes('not configured') ? 503 : 500;
     return NextResponse.json({ 
       error: error.message,

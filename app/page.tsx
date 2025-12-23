@@ -5,7 +5,8 @@ import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import CTA from "@/components/sections/CTA";
 import { fetchHomePage, fetchServices, fetchProjects } from "@/lib/api";
 
-export const revalidate = 60; // Revalidate every minute for faster updates
+export const revalidate = 0; // Always fetch fresh data - no caching
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://atech.com";
 

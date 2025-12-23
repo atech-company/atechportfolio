@@ -28,7 +28,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // Revalidate every minute for faster updates
+export const revalidate = 0; // Always fetch fresh data - no caching
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export default async function PortfolioPage() {
   const projects = await fetchProjects();

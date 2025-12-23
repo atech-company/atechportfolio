@@ -112,8 +112,8 @@ async function fetchAPI<T>(
     const response = await fetch(url, {
       ...options,
       headers,
-      // Use revalidate for better performance while keeping data fresh
-      next: { revalidate: 30 }, // Revalidate every 30 seconds for faster updates
+      // Force fresh data - no caching
+      cache: 'no-store',
     });
 
     if (!response.ok) {

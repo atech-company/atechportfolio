@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 // Public API endpoint (for frontend)
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
+export const revalidate = 0; // No caching
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
