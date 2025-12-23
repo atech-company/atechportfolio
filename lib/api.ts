@@ -265,9 +265,9 @@ export async function fetchProjects(options?: {
     hasData: !!data,
     isArray: Array.isArray(data),
     length: Array.isArray(data) ? data.length : 'not array',
-    firstItem: Array.isArray(data) && data.length > 0 ? data[0] : null,
+    firstItem: Array.isArray(data) && data.length > 0 ? JSON.stringify(data[0]).substring(0, 200) : null,
     dataType: typeof data,
-    dataValue: data,
+    fullData: JSON.stringify(data).substring(0, 1000), // First 1000 chars
   });
   
   if (!data) {
@@ -279,8 +279,13 @@ export async function fetchProjects(options?: {
   if (!Array.isArray(data)) {
     console.error('[fetchProjects] Data is not an array:', {
       type: typeof data,
-      value: data,
+      value: JSON.stringify(data).substring(0, 500),
     });
+    // Try to extract array from object
+    if (data && typeof data === 'object' && 'data' in data && Array.isArray(data.data)) {
+      console.log('[fetchProjects] Found data.data array, using that');
+      return data.data;
+    }
     return [];
   }
   
