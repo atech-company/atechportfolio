@@ -127,10 +127,25 @@ async function fetchAPI<T>(
       hasData: !!jsonData.data,
       dataType: Array.isArray(jsonData.data) ? 'array' : typeof jsonData.data,
       dataLength: Array.isArray(jsonData.data) ? jsonData.data.length : 'not array',
+      fullResponse: JSON.stringify(jsonData).substring(0, 500), // First 500 chars for debugging
     });
     
+    // Handle case where response might not have 'data' wrapper
+    if (!jsonData.data && Array.isArray(jsonData)) {
+      console.log('[fetchAPI] Response is direct array, not wrapped in data');
+      return jsonData as T;
+    }
+    
     const data: StrapiResponse<T> = jsonData;
-    return data.data as T;
+    const extracted = data.data as T;
+    
+    console.log('[fetchAPI] Extracted data:', {
+      type: typeof extracted,
+      isArray: Array.isArray(extracted),
+      length: Array.isArray(extracted) ? extracted.length : 'not array',
+    });
+    
+    return extracted;
   } catch (error) {
     console.error("Error fetching from API:", error);
     return null;
@@ -251,56 +266,125 @@ export async function fetchProjects(options?: {
     isArray: Array.isArray(data),
     length: Array.isArray(data) ? data.length : 'not array',
     firstItem: Array.isArray(data) && data.length > 0 ? data[0] : null,
+    dataType: typeof data,
+    dataValue: data,
   });
-  if (!data) return [];
+  
+  if (!data) {
+    console.warn('[fetchProjects] No data returned from API');
+    return [];
+  }
+  
+  // Ensure data is an array
+  if (!Array.isArray(data)) {
+    console.error('[fetchProjects] Data is not an array:', {
+      type: typeof data,
+      value: data,
+    });
+    return [];
+  }
+  
+  if (data.length === 0) {
+    console.warn('[fetchProjects] Empty array returned from API');
+    return [];
+  }
   
   // Transform from API response - extract attributes if present
-  return data.map((item: any) => {
-    let project: any;
-    
-    if (item.attributes) {
-      project = { id: item.id, ...item.attributes };
-    } else {
-      project = item;
-    }
-    
-    // Thumbnail should already be a string, but handle Strapi format just in case
-    if (project.thumbnail && typeof project.thumbnail === 'object') {
-      if (project.thumbnail.data) {
-        if (project.thumbnail.data.attributes && project.thumbnail.data.attributes.url) {
-          project.thumbnail = project.thumbnail.data.attributes.url;
-        } else if (typeof project.thumbnail.data === 'string') {
-          project.thumbnail = project.thumbnail.data;
-        } else if (project.thumbnail.data && typeof project.thumbnail.data === 'object' && project.thumbnail.data.url) {
-          project.thumbnail = project.thumbnail.data.url;
-        }
-      } else if (project.thumbnail.attributes && project.thumbnail.attributes.url) {
-        project.thumbnail = project.thumbnail.attributes.url;
-      } else if (project.thumbnail.url) {
-        project.thumbnail = project.thumbnail.url;
+  const transformed = data.map((item: any, index: number) => {
+    try {
+      console.log(`[fetchProjects] Transforming item ${index}:`, {
+        hasAttributes: !!item.attributes,
+        hasId: !!item.id,
+        itemKeys: Object.keys(item),
+      });
+      
+      let project: any;
+      
+      if (item.attributes) {
+        // Strapi format: { id, attributes: {...} }
+        project = { id: item.id, ...item.attributes };
+        console.log(`[fetchProjects] Item ${index} - Extracted from attributes:`, {
+          id: project.id,
+          title: project.title,
+          slug: project.slug,
+        });
+      } else {
+        // Direct format: already flattened
+        project = item;
+        console.log(`[fetchProjects] Item ${index} - Using direct format:`, {
+          id: project.id,
+          title: project.title,
+          slug: project.slug,
+        });
       }
-    }
-    
-    // Images should already be an array of strings, but handle Strapi format just in case
-    if (project.images && typeof project.images === 'object' && !Array.isArray(project.images)) {
-      if (project.images.data) {
-        if (Array.isArray(project.images.data)) {
-          project.images = project.images.data.map((img: any) => {
-            if (typeof img === 'string') return img;
-            if (img.attributes && img.attributes.url) return img.attributes.url;
-            if (typeof img === 'object' && img.url) return img.url;
-            return img;
-          });
-        } else if (project.images.data.attributes && project.images.data.attributes.url) {
-          project.images = [project.images.data.attributes.url];
-        } else if (typeof project.images.data === 'string') {
-          project.images = [project.images.data];
+      
+      // Ensure we have required fields
+      if (!project.id || !project.title) {
+        console.warn(`[fetchProjects] Item ${index} missing required fields:`, project);
+        return null;
+      }
+      
+      // Thumbnail should already be a string, but handle Strapi format just in case
+      if (project.thumbnail && typeof project.thumbnail === 'object') {
+        if (project.thumbnail.data) {
+          if (project.thumbnail.data.attributes && project.thumbnail.data.attributes.url) {
+            project.thumbnail = project.thumbnail.data.attributes.url;
+          } else if (typeof project.thumbnail.data === 'string') {
+            project.thumbnail = project.thumbnail.data;
+          } else if (project.thumbnail.data && typeof project.thumbnail.data === 'object' && project.thumbnail.data.url) {
+            project.thumbnail = project.thumbnail.data.url;
+          }
+        } else if (project.thumbnail.attributes && project.thumbnail.attributes.url) {
+          project.thumbnail = project.thumbnail.attributes.url;
+        } else if (project.thumbnail.url) {
+          project.thumbnail = project.thumbnail.url;
         }
       }
+      
+      // Images should already be an array of strings, but handle Strapi format just in case
+      if (project.images && typeof project.images === 'object' && !Array.isArray(project.images)) {
+        if (project.images.data) {
+          if (Array.isArray(project.images.data)) {
+            project.images = project.images.data.map((img: any) => {
+              if (typeof img === 'string') return img;
+              if (img.attributes && img.attributes.url) return img.attributes.url;
+              if (typeof img === 'object' && img.url) return img.url;
+              return img;
+            });
+          } else if (project.images.data.attributes && project.images.data.attributes.url) {
+            project.images = [project.images.data.attributes.url];
+          } else if (typeof project.images.data === 'string') {
+            project.images = [project.images.data];
+          }
+        }
+      }
+      
+      console.log(`[fetchProjects] Item ${index} transformed successfully:`, {
+        id: project.id,
+        title: project.title,
+        slug: project.slug,
+        hasThumbnail: !!project.thumbnail,
+        hasImages: !!project.images,
+      });
+      
+      return project;
+    } catch (error: any) {
+      console.error(`[fetchProjects] Error transforming item ${index}:`, error);
+      console.error(`[fetchProjects] Item data:`, JSON.stringify(item, null, 2));
+      return null;
     }
-    
-    return project;
+  }).filter((p: any) => p !== null && p !== undefined); // Filter out any null/undefined projects
+  
+  console.log('[fetchProjects] Transformed projects:', {
+    count: transformed.length,
+    projects: transformed.map((p: any) => ({
+      id: p?.id,
+      title: p?.title,
+      slug: p?.slug,
+    })),
   });
+  
+  return transformed;
 }
 
 /**
