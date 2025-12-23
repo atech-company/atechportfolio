@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       const beforeCount = projects.length;
       projects = projects.filter((p: any) => {
         // Handle both boolean and string values
-        const isFeatured = p.featured === true || p.featured === 'true' || p.featured === 1;
+        const isFeatured = p.featured === true || p.featured === 'true' || p.featured === 1 || p.featured === '1';
         console.log('[Projects API] Project featured check:', {
           id: p.id,
           title: p.title,

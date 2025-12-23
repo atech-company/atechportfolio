@@ -712,7 +712,7 @@ function transformProject(dbProject: any) {
       title: dbProject.title || '',
       slug: dbProject.slug || '',
       description: dbProject.description || '',
-      featured: dbProject.featured === true || dbProject.featured === 'true' || false,
+      featured: dbProject.featured === true || dbProject.featured === 'true' || dbProject.featured === 1 || dbProject.featured === '1' || false,
       techStack: Array.isArray(dbProject.tech_stack) ? dbProject.tech_stack : (dbProject.tech_stack ? [dbProject.tech_stack] : []),
       projectUrl: dbProject.project_url || null,
       githubUrl: dbProject.github_url || null,
@@ -727,6 +727,9 @@ function transformProject(dbProject: any) {
       title: transformed.title,
       slug: transformed.slug,
       featured: transformed.featured,
+      featuredType: typeof transformed.featured,
+      originalFeatured: dbProject.featured,
+      originalFeaturedType: typeof dbProject.featured,
     });
     
     return transformed;

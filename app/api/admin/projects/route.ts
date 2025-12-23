@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (featured === 'true') {
-      projects = projects.filter((p: any) => p.featured === true);
+      projects = projects.filter((p: any) => {
+        // Handle both boolean and string values
+        return p.featured === true || p.featured === 'true' || p.featured === 1 || p.featured === '1';
+      });
     }
 
     if (slug) {
