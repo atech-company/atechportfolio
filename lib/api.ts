@@ -282,9 +282,12 @@ export async function fetchProjects(options?: {
       value: JSON.stringify(data).substring(0, 500),
     });
     // Try to extract array from object
-    if (data && typeof data === 'object' && 'data' in data && Array.isArray(data.data)) {
-      console.log('[fetchProjects] Found data.data array, using that');
-      return data.data;
+    if (data && typeof data === 'object' && data !== null && 'data' in data) {
+      const dataObj = data as any;
+      if (Array.isArray(dataObj.data)) {
+        console.log('[fetchProjects] Found data.data array, using that');
+        return dataObj.data;
+      }
     }
     return [];
   }
