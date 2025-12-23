@@ -31,8 +31,24 @@ export async function GET(request: NextRequest) {
     }
 
     if (featured === 'true') {
-      projects = projects.filter((p: any) => p.featured === true);
-      console.log('[Projects API] Filtered featured projects:', projects.length);
+      const beforeCount = projects.length;
+      projects = projects.filter((p: any) => {
+        // Handle both boolean and string values
+        const isFeatured = p.featured === true || p.featured === 'true' || p.featured === 1;
+        console.log('[Projects API] Project featured check:', {
+          id: p.id,
+          title: p.title,
+          featured: p.featured,
+          featuredType: typeof p.featured,
+          isFeatured,
+        });
+        return isFeatured;
+      });
+      console.log('[Projects API] Filtered featured projects:', {
+        before: beforeCount,
+        after: projects.length,
+        filtered: beforeCount - projects.length,
+      });
     }
 
     if (slug) {

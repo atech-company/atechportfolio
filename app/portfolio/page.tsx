@@ -34,10 +34,21 @@ export const dynamic = 'force-dynamic'; // Force dynamic rendering
 export default async function PortfolioPage() {
   const projects = await fetchProjects();
 
+  // Debug logging
+  console.log('[Portfolio Page] Projects received:', {
+    count: projects?.length || 0,
+    projects: projects?.map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      featured: p.featured,
+      slug: p.slug,
+    })) || [],
+  });
+
   return (
     <>
       <PortfolioHero />
-      <ProjectsGrid projects={projects} />
+      <ProjectsGrid projects={projects || []} />
     </>
   );
 }

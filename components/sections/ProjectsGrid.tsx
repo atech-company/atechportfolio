@@ -13,7 +13,18 @@ interface ProjectsGridProps {
 }
 
 export default function ProjectsGrid({ projects }: ProjectsGridProps) {
+  // Debug logging
+  console.log('[ProjectsGrid Component] Received projects:', {
+    count: projects?.length || 0,
+    projects: projects?.map((p: any) => ({
+      id: p?.id,
+      title: p?.title,
+      slug: p?.slug,
+    })) || [],
+  });
+
   if (!projects || projects.length === 0) {
+    console.warn('[ProjectsGrid Component] No projects to display');
     return (
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">

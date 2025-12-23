@@ -42,11 +42,22 @@ export default async function Home() {
     fetchProjects({ featured: true, limit: 6 }),
   ]);
 
+  // Debug logging
+  console.log('[Home Page] Projects received:', {
+    count: projects?.length || 0,
+    projects: projects?.map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      featured: p.featured,
+      slug: p.slug,
+    })) || [],
+  });
+
   return (
     <>
       <Hero data={homePage?.hero} />
       <Services services={services} />
-      <FeaturedProjects projects={projects} />
+      <FeaturedProjects projects={projects || []} />
       <CTA data={homePage?.cta} />
     </>
   );

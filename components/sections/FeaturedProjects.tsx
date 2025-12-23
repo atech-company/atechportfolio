@@ -13,7 +13,18 @@ interface FeaturedProjectsProps {
 }
 
 export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
+  // Debug logging
+  console.log('[FeaturedProjects Component] Received projects:', {
+    count: projects?.length || 0,
+    projects: projects?.map((p: any) => ({
+      id: p?.id,
+      title: p?.title,
+      slug: p?.slug,
+    })) || [],
+  });
+
   if (!projects || projects.length === 0) {
+    console.warn('[FeaturedProjects Component] No projects to display');
     return null;
   }
 
