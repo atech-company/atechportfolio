@@ -4,10 +4,15 @@ import { fetchProject, fetchProjects } from "@/lib/api";
 import ProjectDetail from "@/components/sections/ProjectDetail";
 
 export async function generateStaticParams() {
-  const projects = await fetchProjects();
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+  try {
+    const projects = await fetchProjects();
+    return projects.map((project) => ({
+      slug: project.slug,
+    }));
+  } catch (error: any) {
+    console.error('[generateStaticParams] Error fetching projects:', error);
+    return []; // Return empty array on error to prevent build failure
+  }
 }
 
 export async function generateMetadata({
@@ -15,14 +20,15 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const project = await fetchProject(params.slug);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://atech.com";
-  
-  if (!project) {
-    return {
-      title: "Project Not Found",
-    };
-  }
+  try {
+    const project = await fetchProject(params.slug);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://atech.com";
+    
+    if (!project) {
+      return {
+        title: "Project Not Found",
+      };
+    }
 
   let thumbnailUrl = "";
   const thumbnail = project.thumbnail as any;
@@ -38,48 +44,61 @@ export async function generateMetadata({
     thumbnailUrl = thumbnail.url.startsWith('http') ? thumbnail.url : `${siteUrl}${thumbnail.url}`;
   }
 
-  return {
-    title: `${project.title} - Portfolio Project | ATECH`,
-    description: project.description || `Explore ${project.title} - a project by ATECH showcasing our expertise in software development and digital solutions.`,
-    keywords: [
-      project.title,
-      ...(project.techStack || []),
-      "portfolio project",
-      "case study",
-      "software development",
-    ],
-    openGraph: {
+    return {
       title: `${project.title} - Portfolio Project | ATECH`,
-      description: project.description || `Explore ${project.title} - a project by ATECH.`,
-      url: `${siteUrl}/portfolio/${params.slug}`,
-      type: "website",
-      images: thumbnailUrl ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: project.title }] : [],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${project.title} - Portfolio Project | ATECH`,
-      description: project.description || `Explore ${project.title} - a project by ATECH.`,
-      images: thumbnailUrl ? [thumbnailUrl] : [],
-    },
-    alternates: {
-      canonical: `${siteUrl}/portfolio/${params.slug}`,
-    },
-  };
+      description: project.description || `Explore ${project.title} - a project by ATECH showcasing our expertise in software development and digital solutions.`,
+      keywords: [
+        project.title,
+        ...(project.techStack || []),
+        "portfolio project",
+        "case study",
+        "software development",
+      ],
+      openGraph: {
+        title: `${project.title} - Portfolio Project | ATECH`,
+        description: project.description || `Explore ${project.title} - a project by ATECH.`,
+        url: `${siteUrl}/portfolio/${params.slug}`,
+        type: "website",
+        images: thumbnailUrl ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: project.title }] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${project.title} - Portfolio Project | ATECH`,
+        description: project.description || `Explore ${project.title} - a project by ATECH.`,
+        images: thumbnailUrl ? [thumbnailUrl] : [],
+      },
+      alternates: {
+        canonical: `${siteUrl}/portfolio/${params.slug}`,
+      },
+    };
+  } catch (error: any) {
+    console.error(`[Project Page Metadata] Error fetching project with slug ${params.slug}:`, error);
+    return {
+      title: "Project Not Found",
+    };
+  }
 }
 
-export const revalidate = 3600;
+export const revalidate = 0; // Always fetch fresh data
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export default async function ProjectPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const project = await fetchProject(params.slug);
+  try {
+    const project = await fetchProject(params.slug);
 
-  if (!project) {
+    if (!project) {
+      console.warn(`[Project Page] Project not found for slug: ${params.slug}`);
+      notFound();
+    }
+
+    return <ProjectDetail project={project} />;
+  } catch (error: any) {
+    console.error(`[Project Page] Error fetching project with slug ${params.slug}:`, error);
     notFound();
   }
-
-  return <ProjectDetail project={project} />;
 }
 

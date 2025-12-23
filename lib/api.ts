@@ -407,49 +407,74 @@ export async function fetchProjects(options?: {
  * Fetch a single project by slug
  */
 export async function fetchProject(slug: string): Promise<Project | null> {
-  // During build time, read directly from files
-  if (isBuildTime()) {
-    const database = await getDb();
-    return database ? (await database.getProjectBySlug(slug) || null) : null;
-  }
-  
-  const data = await fetchAPI<any>(`/api/content/projects?slug=${slug}`);
-  if (!data) return null;
-  
-  // Handle Strapi format transformation
-  let project: any;
-  if (data.attributes) {
-    project = { id: data.id, ...data.attributes };
-  } else {
-    project = data;
-  }
-  
-  // Extract thumbnail URL from Strapi format if needed
-  if (project.thumbnail && typeof project.thumbnail === 'object' && project.thumbnail.data) {
-    if (project.thumbnail.data.attributes && project.thumbnail.data.attributes.url) {
-      project.thumbnail = project.thumbnail.data.attributes.url;
-    } else if (typeof project.thumbnail.data === 'string') {
-      project.thumbnail = project.thumbnail.data;
+  try {
+    // During build time, read directly from files
+    if (isBuildTime()) {
+      const database = await getDb();
+      return database ? (await database.getProjectBySlug(slug) || null) : null;
     }
-  }
-  
-  // Extract images array from Strapi format if needed
-  if (project.images && typeof project.images === 'object' && project.images.data) {
-    if (Array.isArray(project.images.data)) {
-      project.images = project.images.data.map((img: any) => {
-        if (typeof img === 'string') return img;
-        if (img.attributes && img.attributes.url) return img.attributes.url;
-        if (typeof img === 'object' && img.url) return img.url;
-        return img;
-      });
-    } else if (project.images.data.attributes && project.images.data.attributes.url) {
-      project.images = [project.images.data.attributes.url];
-    } else if (typeof project.images.data === 'string') {
-      project.images = [project.images.data];
+    
+    console.log(`[fetchProject] Fetching project with slug: ${slug}`);
+    const data = await fetchAPI<any>(`/api/content/projects?slug=${slug}`);
+    
+    if (!data) {
+      console.warn(`[fetchProject] No data returned for slug: ${slug}`);
+      return null;
     }
+    
+    console.log(`[fetchProject] Data received for slug ${slug}:`, {
+      hasAttributes: !!data.attributes,
+      hasId: !!data.id,
+      keys: Object.keys(data),
+    });
+    
+    // Handle Strapi format transformation
+    let project: any;
+    if (data.attributes) {
+      project = { id: data.id, ...data.attributes };
+    } else {
+      project = data;
+    }
+    
+    // Extract thumbnail URL from Strapi format if needed
+    if (project.thumbnail && typeof project.thumbnail === 'object' && project.thumbnail.data) {
+      if (project.thumbnail.data.attributes && project.thumbnail.data.attributes.url) {
+        project.thumbnail = project.thumbnail.data.attributes.url;
+      } else if (typeof project.thumbnail.data === 'string') {
+        project.thumbnail = project.thumbnail.data;
+      } else if (project.thumbnail.data && typeof project.thumbnail.data === 'object' && project.thumbnail.data.url) {
+        project.thumbnail = project.thumbnail.data.url;
+      }
+    }
+    
+    // Extract images array from Strapi format if needed
+    if (project.images && typeof project.images === 'object' && project.images.data) {
+      if (Array.isArray(project.images.data)) {
+        project.images = project.images.data.map((img: any) => {
+          if (typeof img === 'string') return img;
+          if (img.attributes && img.attributes.url) return img.attributes.url;
+          if (typeof img === 'object' && img.url) return img.url;
+          return img;
+        });
+      } else if (project.images.data.attributes && project.images.data.attributes.url) {
+        project.images = [project.images.data.attributes.url];
+      } else if (typeof project.images.data === 'string') {
+        project.images = [project.images.data];
+      }
+    }
+    
+    console.log(`[fetchProject] Project transformed for slug ${slug}:`, {
+      id: project.id,
+      title: project.title,
+      hasThumbnail: !!project.thumbnail,
+      hasImages: !!project.images,
+    });
+    
+    return project;
+  } catch (error: any) {
+    console.error(`[fetchProject] Error fetching project with slug ${slug}:`, error);
+    return null;
   }
-  
-  return project;
 }
 
 /**
