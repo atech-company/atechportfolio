@@ -384,6 +384,13 @@ export async function fetchProjects(options?: {
     })),
   });
   
+  if (transformed.length === 0 && data.length > 0) {
+    console.error('[fetchProjects] WARNING: Transformation resulted in empty array but input had data!');
+    console.error('[fetchProjects] Original data sample:', JSON.stringify(data[0], null, 2));
+    // Fallback: return data as-is if transformation failed
+    return data.filter((item: any) => item && (item.id || item.attributes?.id));
+  }
+  
   return transformed;
 }
 
