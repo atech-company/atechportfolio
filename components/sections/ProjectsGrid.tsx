@@ -16,19 +16,29 @@ export default function ProjectsGrid({ projects }: ProjectsGridProps) {
   // Debug logging
   console.log('[ProjectsGrid Component] Received projects:', {
     count: projects?.length || 0,
+    isArray: Array.isArray(projects),
+    type: typeof projects,
     projects: projects?.map((p: any) => ({
       id: p?.id,
       title: p?.title,
       slug: p?.slug,
+      hasAllFields: !!(p?.id && p?.title && p?.slug),
     })) || [],
+    rawProjects: projects, // Log the actual array
   });
 
   if (!projects || projects.length === 0) {
     console.warn('[ProjectsGrid Component] No projects to display');
+    console.warn('[ProjectsGrid Component] Projects value:', projects);
+    console.warn('[ProjectsGrid Component] Projects type:', typeof projects);
+    console.warn('[ProjectsGrid Component] Is array:', Array.isArray(projects));
     return (
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-gray-400 text-lg">No projects found.</p>
+          <p className="text-gray-500 text-sm mt-2">
+            Debug: Received {projects?.length || 0} projects
+          </p>
         </div>
       </section>
     );

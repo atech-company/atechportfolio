@@ -44,6 +44,20 @@ export default async function PortfolioPage() {
       slug: p.slug,
     })) || [],
   });
+  
+  // Additional validation
+  if (!projects || projects.length === 0) {
+    console.error('[Portfolio Page] WARNING: No projects received from fetchProjects');
+    console.error('[Portfolio Page] Projects value:', projects);
+  } else {
+    console.log('[Portfolio Page] First project details:', {
+      id: projects[0]?.id,
+      title: projects[0]?.title,
+      slug: projects[0]?.slug,
+      featured: projects[0]?.featured,
+      allKeys: Object.keys(projects[0] || {}),
+    });
+  }
 
   return (
     <>
