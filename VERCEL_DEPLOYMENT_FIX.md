@@ -101,3 +101,4 @@ If you prefer file system storage, consider deploying to Hostinger VPS instead:
 - **KV Storage**: Free tier includes 256 MB storage
 - Both services scale automatically with your Vercel plan
 
+

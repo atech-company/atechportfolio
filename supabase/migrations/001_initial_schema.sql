@@ -131,3 +131,4 @@ CREATE TRIGGER update_about_page_updated_at BEFORE UPDATE ON about_page
 CREATE TRIGGER update_global_settings_updated_at BEFORE UPDATE ON global_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+

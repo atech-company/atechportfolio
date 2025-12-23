@@ -113,7 +113,7 @@ async function fetchAPI<T>(
       ...options,
       headers,
       // Use revalidate for better performance while keeping data fresh
-      next: { revalidate: 60 }, // Revalidate every 60 seconds
+      next: { revalidate: 30 }, // Revalidate every 30 seconds for faster updates
     });
 
     if (!response.ok) {

@@ -77,3 +77,4 @@ Once Supabase is configured:
 3. Check Supabase dashboard to see if data is being created
 4. Check Vercel logs for detailed error messages
 
+

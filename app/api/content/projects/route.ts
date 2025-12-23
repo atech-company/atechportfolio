@@ -17,19 +17,25 @@ export async function GET(request: NextRequest) {
       console.log('[Projects API] First project sample:', {
         id: projects[0].id,
         title: projects[0].title,
+        slug: projects[0].slug,
+        featured: projects[0].featured,
         thumbnail: projects[0].thumbnail,
         hasImages: !!projects[0].images,
+        imagesCount: Array.isArray(projects[0].images) ? projects[0].images.length : 0,
       });
+    } else {
+      console.warn('[Projects API] No projects found in database');
     }
 
     if (featured === 'true') {
       projects = projects.filter((p: any) => p.featured === true);
+      console.log('[Projects API] Filtered featured projects:', projects.length);
     }
 
     if (slug) {
       const project = projects.find((p: any) => p.slug === slug);
       if (project) {
-        // Transform to match Strapi format
+        // Transform to match Strapi format for single project
         return NextResponse.json({
           data: {
             id: project.id,
@@ -41,6 +47,7 @@ export async function GET(request: NextRequest) {
           },
         });
       }
+      console.warn('[Projects API] Project not found for slug:', slug);
       return NextResponse.json({ data: null });
     }
 
@@ -68,8 +75,10 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    console.log('[Projects API] Returning transformed projects:', transformed.length);
     return NextResponse.json({ data: transformed });
   } catch (error: any) {
+    console.error('[Projects API] Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

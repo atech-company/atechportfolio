@@ -21,3 +21,4 @@ export function getStrapiImageUrl(image: Image | string | undefined | null): str
   return null;
 }
 
+

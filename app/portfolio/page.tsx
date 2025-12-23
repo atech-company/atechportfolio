@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const revalidate = 60; // Revalidate every minute for faster updates
 
 export default async function PortfolioPage() {
   const projects = await fetchProjects();

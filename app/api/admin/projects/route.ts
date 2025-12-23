@@ -10,6 +10,16 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get('slug');
 
     let projects = await db.getProjects();
+    
+    console.log('[Admin Projects API] Total projects:', projects.length);
+    if (projects.length > 0) {
+      console.log('[Admin Projects API] Sample project:', {
+        id: projects[0].id,
+        title: projects[0].title,
+        slug: projects[0].slug,
+        featured: projects[0].featured,
+      });
+    }
 
     if (featured === 'true') {
       projects = projects.filter((p: any) => p.featured === true);
@@ -25,6 +35,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: projects });
   } catch (error: any) {
+    console.error('[Admin Projects API] Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

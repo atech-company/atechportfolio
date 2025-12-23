@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, ExternalLink, Github } from 'lucide-react';
+import { Plus, Edit, Trash2, ExternalLink, Github, RefreshCw } from 'lucide-react';
 
 interface Project {
   id: number;
@@ -33,11 +33,20 @@ export default function AdminProjects() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('/api/admin/projects');
+      const res = await fetch('/api/admin/projects', {
+        cache: 'no-store', // Always fetch fresh data
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch projects: ${res.status}`);
+      }
       const data = await res.json();
-      setProjects(data.data || []);
+      console.log('[Admin Projects] Fetched data:', data);
+      // Handle both { data: [...] } and direct array response
+      const projectsList = data.data || data || [];
+      setProjects(Array.isArray(projectsList) ? projectsList : []);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      alert('Failed to load projects. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -88,13 +97,25 @@ export default function AdminProjects() {
             </Link>
             <h1 className="text-2xl font-bold text-white">Projects</h1>
           </div>
-          <Link
-            href="/admin/projects/new"
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neon-blue to-neon-green rounded-lg font-semibold text-dark-900 hover:scale-105 transition-transform"
-          >
-            <Plus size={20} />
-            Add New Project
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setLoading(true);
+                fetchProjects();
+              }}
+              className="flex items-center gap-2 px-4 py-2 glass rounded-lg text-white hover:bg-white/10 transition-colors"
+              title="Refresh projects list"
+            >
+              <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+            </button>
+            <button
+              onClick={() => router.push('/admin/projects/new')}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neon-blue to-neon-green rounded-lg font-semibold text-dark-900 hover:scale-105 transition-transform shadow-lg hover:shadow-neon-blue/50"
+            >
+              <Plus size={20} />
+              Add New Project
+            </button>
+          </div>
         </div>
       </header>
 
@@ -102,13 +123,13 @@ export default function AdminProjects() {
         {projects.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400 mb-4">No projects yet.</p>
-            <Link
-              href="/admin/projects/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-green rounded-lg font-semibold text-dark-900"
+            <button
+              onClick={() => router.push('/admin/projects/new')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-green rounded-lg font-semibold text-dark-900 hover:scale-105 transition-transform shadow-lg hover:shadow-neon-blue/50"
             >
               <Plus size={20} />
               Create Your First Project
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

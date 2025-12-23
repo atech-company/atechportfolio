@@ -110,3 +110,4 @@ For issues or questions:
 2. Review Supabase logs in dashboard
 3. Check browser console and server logs for errors
 
+

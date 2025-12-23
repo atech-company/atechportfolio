@@ -5,7 +5,7 @@ import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import CTA from "@/components/sections/CTA";
 import { fetchHomePage, fetchServices, fetchProjects } from "@/lib/api";
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 60; // Revalidate every minute for faster updates
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://atech.com";
 
